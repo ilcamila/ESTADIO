@@ -1,20 +1,31 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 
-// Configuración del cliente de PostgreSQL utilizando la variable de entorno `DATABASE_URL`
+// Configuración del cliente de PostgreSQL
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Esto es importante para evitar problemas de SSL en servidores remotos
+    rejectUnauthorized: false, // Asegúrate de que esté configurado correctamente para tu entorno
   },
 });
+
+// Agrega una propiedad para rastrear el estado de conexión
+let isConnected = false;
+
+async function connectClient() {
+  if (!isConnected) {
+    await client.connect();
+    isConnected = true; // Marca como conectado
+    console.log("Conexión establecida con la base de datos");
+  }
+}
 
 export async function POST(req: Request) {
   const { humidity_value, location } = await req.json();
 
   try {
-    // Conectar a la base de datos
-    await client.connect();
+    // Asegúrate de que el cliente esté conectado antes de ejecutar la consulta
+    await connectClient();
 
     // Inserta los datos en la tabla `Humedad`
     const query = `
@@ -24,9 +35,6 @@ export async function POST(req: Request) {
     `;
     const values = [humidity_value, location];
     const res = await client.query(query, values);
-
-    // Cierra la conexión a la base de datos
-    await client.end();
 
     // Responde con los datos insertados
     return NextResponse.json(res.rows[0]);
