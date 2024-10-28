@@ -9,13 +9,20 @@ const client = new Client({
   },
 });
 
+// Conéctate a la base de datos solo una vez
+(async () => {
+  try {
+    await client.connect();
+    console.log('Conexión a la base de datos establecida');
+  } catch (error) {
+    console.error('Error al conectar a la base de datos:', error);
+  }
+})();
+
 export async function POST(req: Request) {
   const { humidity_value, location } = await req.json();
 
   try {
-    // Conecta a la base de datos
-    await client.connect();
-
     // Inserta los datos en la tabla de humedad
     const query = `
       INSERT INTO Humedad (humidity_value, location)
@@ -30,8 +37,5 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error('Error al insertar datos:', err);
     return NextResponse.json({ error: 'Error al insertar datos' }, { status: 500 });
-  } finally {
-    // Cierra la conexión a la base de datos
-    await client.end();
   }
 }

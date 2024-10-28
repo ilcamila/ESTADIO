@@ -23,19 +23,47 @@ export default function SensorsPage() {
   });
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch('/api/sensors');
-      const data = await response.json();
+    async function sendHumidityData() {
+      // Genera un valor aleatorio de humedad entre 0 y 100 para simular la medición
+      const humidityValue = Math.random() * 100;
+      const location = 'Zona Aleatoria';
 
-      const now = new Date(data.timestamp).toLocaleTimeString();
-      setHistory(prev => ({
-        timestamps: [...prev.timestamps, now].slice(-10),
-        humidity: [...prev.humidity, data.humidity].slice(-10),
-      }));
+      // Envía los datos de humedad a la API usando una solicitud POST
+      try {
+        const response = await fetch('/api/sensors', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            humidity_value: humidityValue.toFixed(2),
+            location: location,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Dato de humedad enviado:', data);
+
+          // Actualiza el estado para el gráfico con el nuevo dato
+          const now = new Date().toLocaleTimeString();
+          setHistory(prev => ({
+            timestamps: [...prev.timestamps, now].slice(-10),
+            humidity: [...prev.humidity, parseFloat(humidityValue.toFixed(2))].slice(-10),
+          }));
+        } else {
+          console.error('Error al enviar el dato de humedad:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error en la solicitud:', error);
+      }
     }
 
-    fetchData();
-    const interval = setInterval(fetchData, 10000);
+    // Llama a la función inmediatamente y luego cada 10 segundos
+    sendHumidityData();
+    const interval = setInterval(sendHumidityData, 10000);
+
+    // Limpia el intervalo cuando el componente se desmonte
     return () => clearInterval(interval);
   }, []);
 
