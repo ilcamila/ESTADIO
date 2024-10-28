@@ -22,7 +22,7 @@ export default function SensorsPage() {
     humidity: [] as number[],
   });
   const [location, setLocation] = useState('Zona Aleatoria');
-  const [grassHeight, setGrassHeight] = useState('5 cm'); // Ejemplo de altura del césped
+  const [grassHeight, setGrassHeight] = useState('5 cm');
 
   useEffect(() => {
     async function sendHumidityData() {
@@ -61,6 +61,16 @@ export default function SensorsPage() {
     const interval = setInterval(sendHumidityData, 10000);
     return () => clearInterval(interval);
   }, [location]);
+
+  useEffect(() => {
+    const updateData = () => {
+      setLocation(`Zona Aleatoria ${Math.floor(Math.random() * 100)}`);
+      setGrassHeight(`${Math.floor(Math.random() * 10 + 1)} cm`);
+    };
+
+    const interval = setInterval(updateData, 15000); // Cambia cada 15 segundos
+    return () => clearInterval(interval);
+  }, []);
 
   const data = {
     labels: history.timestamps,
