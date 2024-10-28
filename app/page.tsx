@@ -10,8 +10,8 @@ export default function HomePage() {
           <Image
             src="Logo_Universidad_de_Cundinamarca.png"
             alt="Logo Universidad de Cundinamarca"
-            width={100} // Tamaño ajustable
-            height={100}
+            width={400} // Tamaño ajustable
+            height={400}
             className="rounded-full shadow-lg"
           />
         </div>
@@ -19,7 +19,7 @@ export default function HomePage() {
         {/* Contenido Principal */}
         <div className="bg-gray-800 shadow-2xl rounded-3xl p-10 w-full max-w-3xl text-left transform hover:scale-105 transition-all duration-300 ease-in-out">
           <h1 className="text-5xl font-semibold mb-6 text-teal-400 text-center border-b border-teal-500 pb-3">
-            Dashboard del Estadio
+            Estadio UDEC
           </h1>
 
           <p className="text-lg mb-4 text-gray-300 leading-relaxed text-center">
@@ -32,7 +32,7 @@ export default function HomePage() {
             <Image
               src="/images.png" // Asegúrate de que esta imagen esté en la carpeta 'public/'
               alt="Estadio"
-              width={700}
+              width={400}
               height={400}
               className="rounded-3xl shadow-lg border-4 border-teal-600 transition-transform transform hover:scale-105"
             />
@@ -54,8 +54,8 @@ export default function HomePage() {
           <Image
             src="Logo_Universidad_de_Cundinamarca.png"
             alt="Logo Universidad de Cundinamarca"
-            width={100} // Tamaño ajustable
-            height={100}
+            width={400} // Tamaño ajustable
+            height={400}
             className="rounded-full shadow-lg"
           />
         </div>
