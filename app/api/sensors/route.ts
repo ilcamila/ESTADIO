@@ -5,16 +5,15 @@ import { Client } from 'pg';
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // Esto es importante para evitar problemas de SSL en servidores remotos
   },
 });
 
-// Función para manejar las solicitudes `POST`
 export async function POST(req: Request) {
   const { humidity_value, location } = await req.json();
 
   try {
-    // Conecta a la base de datos en cada solicitud
+    // Conectar a la base de datos
     await client.connect();
 
     // Inserta los datos en la tabla `Humedad`
@@ -26,13 +25,13 @@ export async function POST(req: Request) {
     const values = [humidity_value, location];
     const res = await client.query(query, values);
 
+    // Cierra la conexión a la base de datos
+    await client.end();
+
     // Responde con los datos insertados
     return NextResponse.json(res.rows[0]);
   } catch (err) {
     console.error('Error al insertar datos:', err);
     return NextResponse.json({ error: 'Error al insertar datos' }, { status: 500 });
-  } finally {
-    // Cierra la conexión a la base de datos
-    await client.end();
   }
 }
