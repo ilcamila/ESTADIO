@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Line } from 'react-chartjs-2';
 import {
@@ -10,7 +13,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { useState, useEffect } from 'react';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -21,19 +23,47 @@ export default function SensorsPage() {
   });
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch('/api/sensors');
-      const data = await response.json();
+    async function sendHumidityData() {
+      // Genera un valor aleatorio de humedad entre 0 y 100 para simular la medición
+      const humidityValue = Math.random() * 100;
+      const location = 'Zona Aleatoria';
 
-      const now = new Date(data.timestamp).toLocaleTimeString();
-      setHistory(prev => ({
-        timestamps: [...prev.timestamps, now].slice(-10),
-        humidity: [...prev.humidity, data.humidity].slice(-10),
-      }));
+      // Envía los datos de humedad a la API usando una solicitud POST
+      try {
+        const response = await fetch('/api/sensors', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            humidity_value: humidityValue.toFixed(2),
+            location: location,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Dato de humedad enviado:', data);
+
+          // Actualiza el estado para el gráfico con el nuevo dato
+          const now = new Date().toLocaleTimeString();
+          setHistory(prev => ({
+            timestamps: [...prev.timestamps, now].slice(-10),
+            humidity: [...prev.humidity, parseFloat(humidityValue.toFixed(2))].slice(-10),
+          }));
+        } else {
+          console.error('Error al enviar el dato de humedad:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error en la solicitud:', error);
+      }
     }
 
-    fetchData();
-    const interval = setInterval(fetchData, 15000);
+    // Llama a la función inmediatamente y luego cada 10 segundos
+    sendHumidityData();
+    const interval = setInterval(sendHumidityData, 10000);
+
+    // Limpia el intervalo cuando el componente se desmonte
     return () => clearInterval(interval);
   }, []);
 
@@ -59,7 +89,7 @@ export default function SensorsPage() {
       },
       title: {
         display: true,
-        text: 'Mediciones de Humedad en Tiempo Real',
+        text: 'Mediciones de Humedad Tiempo Real',
         font: {
           size: 18,
         },
@@ -91,34 +121,17 @@ export default function SensorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center p-8">
-      <div className="grid grid-cols-3 gap-4 w-full max-w-5xl">
-        {/* Panel de información izquierda */}
-        <div className="bg-gray-700 shadow-2xl rounded-2xl p-6 text-center text-white">
-          <h2 className="text-2xl font-semibold mb-4 text-teal-300">Ubicación</h2>
-          <p className="text-lg mb-4">Estadio Principal</p>
-          <p className="text-sm text-gray-300">Coordenadas: 40.7128° N, 74.0060° W</p>
-        </div>
-
-        {/* Panel central con el gráfico */}
-        <div className="bg-gray-800 shadow-2xl rounded-2xl p-8 text-center col-span-1">
-          <h1 className="text-4xl font-semibold mb-4 text-teal-300">Sensor de Humedad</h1>
-          <p className="text-md mb-8 text-gray-300">
-            Observa las mediciones en tiempo real de humedad en porcentaje.
-          </p>
-          <Line data={data} options={options} />
-          <div className="mt-8">
-            <Link href="/" className="bg-teal-500 text-gray-900 font-medium text-lg px-8 py-3 rounded-lg shadow-md hover:bg-teal-400 transition duration-200">
-              Ir al Inicio
-            </Link>
-          </div>
-        </div>
-
-        {/* Panel de información derecha */}
-        <div className="bg-gray-700 shadow-2xl rounded-2xl p-6 text-center text-white">
-          <h2 className="text-2xl font-semibold mb-4 text-teal-300">Altura del Césped</h2>
-          <p className="text-lg mb-4">7.5 cm</p>
-          <p className="text-sm text-gray-300">Ideal para el rendimiento deportivo</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center p-6">
+      <div className="bg-gray-700 shadow-2xl rounded-2xl p-10 w-full max-w-2xl text-center">
+        <h1 className="text-4xl font-semibold mb-4 text-teal-300">Sensor de Humedad</h1>
+        <p className="text-md mb-8 text-gray-300">
+          Observa las mediciones en tiempo real de humedad en porcentaje.
+        </p>
+        <Line data={data} options={options} />
+        <div className="mt-8">
+          <Link href="/" className="bg-teal-500 text-gray-900 font-medium text-lg px-8 py-3 rounded-lg shadow-md hover:bg-teal-400 transition duration-200">
+            Ir al Inicio
+          </Link>
         </div>
       </div>
     </div>
