@@ -1,37 +1,32 @@
-import { useEffect } from 'react';
+import { NextResponse } from 'next/server';
+import { Client } from 'pg';
 
-export default function SendRandomHumidity() {
-  useEffect(() => {
-    const sendRandomHumidity = async () => {
-      const randomHumidity = Math.random() * 100;
-      const location = 'Zona Aleatoria';
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
-      try {
-        const response = await fetch('/api/sensors', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            humidity_value: randomHumidity.toFixed(2),
-            location: location,
-          }),
-        });
+export async function POST(req: Request) {
+  const { humidity_value, location } = await req.json();
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Dato de humedad enviado:', data);
-        } else {
-          console.error('Error al enviar el dato de humedad:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error en la solicitud:', error);
-      }
-    };
+  try {
+    await client.connect();
 
-    sendRandomHumidity();
-    const interval = setInterval(sendRandomHumidity, 15000);
+    const query = `
+      INSERT INTO Humedad (humidity_value, location)
+      VALUES ($1, $2)
+      RETURNING *;
+    `;
+    const values = [humidity_value, location];
+    const res = await client.query(query, values);
 
-    return () => clearInterval(interval);
-  }, []);
+    return NextResponse.json(res.rows[0]);
+  } catch (err) {
+    console.error('Error al insertar datos:', err);
+    return NextResponse.json({ error: 'Error al insertar datos' }, { status: 500 });
+  } finally {
+    await client.end();
+  }
 }
