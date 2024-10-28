@@ -21,14 +21,13 @@ export default function SensorsPage() {
     timestamps: [] as string[],
     humidity: [] as number[],
   });
+  const [location, setLocation] = useState('Zona Aleatoria');
+  const [grassHeight, setGrassHeight] = useState('5 cm'); // Ejemplo de altura del césped
 
   useEffect(() => {
     async function sendHumidityData() {
-      // Genera un valor aleatorio de humedad entre 0 y 100 para simular la medición
       const humidityValue = Math.random() * 100;
-      const location = 'Zona Aleatoria';
 
-      // Envía los datos de humedad a la API usando una solicitud POST
       try {
         const response = await fetch('/api/sensors', {
           method: 'POST',
@@ -37,7 +36,7 @@ export default function SensorsPage() {
           },
           body: JSON.stringify({
             humidity_value: humidityValue.toFixed(2),
-            location: location,
+            location,
           }),
         });
 
@@ -45,7 +44,6 @@ export default function SensorsPage() {
           const data = await response.json();
           console.log('Dato de humedad enviado:', data);
 
-          // Actualiza el estado para el gráfico con el nuevo dato
           const now = new Date().toLocaleTimeString();
           setHistory(prev => ({
             timestamps: [...prev.timestamps, now].slice(-10),
@@ -59,13 +57,10 @@ export default function SensorsPage() {
       }
     }
 
-    // Llama a la función inmediatamente y luego cada 10 segundos
     sendHumidityData();
     const interval = setInterval(sendHumidityData, 10000);
-
-    // Limpia el intervalo cuando el componente se desmonte
     return () => clearInterval(interval);
-  }, []);
+  }, [location]);
 
   const data = {
     labels: history.timestamps,
@@ -89,7 +84,7 @@ export default function SensorsPage() {
       },
       title: {
         display: true,
-        text: 'Mediciones de Humedad Tiempo Real',
+        text: 'Mediciones de Humedad en Tiempo Real',
         font: {
           size: 18,
         },
@@ -122,16 +117,31 @@ export default function SensorsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center p-6">
-      <div className="bg-gray-700 shadow-2xl rounded-2xl p-10 w-full max-w-2xl text-center">
-        <h1 className="text-4xl font-semibold mb-4 text-teal-300">Sensor de Humedad</h1>
-        <p className="text-md mb-8 text-gray-300">
-          Observa las mediciones en tiempo real de humedad en porcentaje.
-        </p>
-        <Line data={data} options={options} />
-        <div className="mt-8">
-          <Link href="/" className="bg-teal-500 text-gray-900 font-medium text-lg px-8 py-3 rounded-lg shadow-md hover:bg-teal-400 transition duration-200">
+      <h1 className="text-5xl font-bold mb-10 text-teal-400">Estación de Monitoreo de Humedad</h1>
+      <div className="flex flex-col lg:flex-row items-center justify-around w-full max-w-6xl space-y-8 lg:space-y-0">
+        
+        {/* Panel Izquierdo */}
+        <div className="bg-gray-700 rounded-lg p-6 w-full lg:w-1/4 text-center shadow-md">
+          <h2 className="text-2xl font-semibold text-teal-300 mb-4">Ubicación</h2>
+          <p className="text-lg text-gray-200">{location}</p>
+        </div>
+
+        {/* Gráfico de Humedad */}
+        <div className="bg-gray-800 shadow-2xl rounded-2xl p-10 w-full lg:w-1/2 text-center">
+          <h2 className="text-3xl font-semibold mb-4 text-teal-300">Sensor de Humedad</h2>
+          <p className="text-md mb-8 text-gray-400">
+            Observa las mediciones en tiempo real de humedad en porcentaje.
+          </p>
+          <Line data={data} options={options} />
+          <Link href="/" className="bg-teal-500 text-gray-900 font-medium text-lg px-8 py-3 mt-6 inline-block rounded-lg shadow-md hover:bg-teal-400 transition duration-200">
             Ir al Inicio
           </Link>
+        </div>
+
+        {/* Panel Derecho */}
+        <div className="bg-gray-700 rounded-lg p-6 w-full lg:w-1/4 text-center shadow-md">
+          <h2 className="text-2xl font-semibold text-teal-300 mb-4">Altura del Césped</h2>
+          <p className="text-lg text-gray-200">{grassHeight}</p>
         </div>
       </div>
     </div>
