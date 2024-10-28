@@ -11,6 +11,6 @@ jobs:
     steps:
       - name: Send request to update sensors data
         env:
-          API_URL: https://estadio-dashboard.vercel.app/api/sensors # Cambia esto por la URL de producción de tu API
+          API_URL: https://estadio-humedad.vercel.app/api/sensors # Cambia esto por la URL de producción de tu API
         run: |
           curl -X GET $API_URL
