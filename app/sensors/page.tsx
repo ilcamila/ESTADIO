@@ -154,6 +154,31 @@ export default function SensorsPage() {
           <p className="text-lg text-gray-200">{grassHeight}</p>
         </div>
       </div>
+
+      {/* Tabla de datos */}
+      <div className="bg-gray-800 shadow-lg rounded-lg p-6 mt-10 w-full max-w-6xl">
+        <h2 className="text-2xl font-semibold text-teal-300 mb-4 text-center">Historial de Datos</h2>
+        <table className="w-full text-left text-gray-300">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border-b border-gray-700">Hora</th>
+              <th className="px-4 py-2 border-b border-gray-700">Humedad (%)</th>
+              <th className="px-4 py-2 border-b border-gray-700">Ubicación</th>
+              <th className="px-4 py-2 border-b border-gray-700">Altura del Césped</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.timestamps.map((timestamp, index) => (
+              <tr key={index}>
+                <td className="px-4 py-2 border-b border-gray-700">{timestamp}</td>
+                <td className="px-4 py-2 border-b border-gray-700">{history.humidity[index]}%</td>
+                <td className="px-4 py-2 border-b border-gray-700">{location}</td>
+                <td className="px-4 py-2 border-b border-gray-700">{grassHeight}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
