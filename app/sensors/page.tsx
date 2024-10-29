@@ -27,6 +27,8 @@ export default function SensorsPage() {
     humidity: [] as number[],
   });
 
+  const [tableData, setTableData] = useState<HumidityData[]>([]);
+
   useEffect(() => {
     async function fetchHumidityData() {
       const response = await fetch('/api/sensors');
@@ -41,6 +43,8 @@ export default function SensorsPage() {
         timestamps: sortedData.map((item) => new Date(item.timestamp).toLocaleTimeString()),
         humidity: sortedData.map((item) => item.humidity_value),
       });
+
+      setTableData(sortedData); // Actualiza los datos de la tabla
     }
 
     fetchHumidityData();
@@ -110,6 +114,28 @@ export default function SensorsPage() {
           Observa las mediciones en tiempo real de humedad en porcentaje.
         </p>
         <Line data={data} options={options} />
+        
+        {/* Tabla de datos de humedad */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4 text-teal-300">Lecturas de Humedad</h2>
+          <table className="min-w-full bg-gray-800 rounded-lg">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 text-gray-300">Hora</th>
+                <th className="py-2 px-4 text-gray-300">Humedad (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((item, index) => (
+                <tr key={index} className="border-t border-gray-700">
+                  <td className="py-2 px-4 text-gray-400">{new Date(item.timestamp).toLocaleTimeString()}</td>
+                  <td className="py-2 px-4 text-gray-400">{item.humidity_value.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <div className="mt-8">
           <Link href="/" className="bg-teal-500 text-gray-900 font-medium text-lg px-8 py-3 rounded-lg shadow-md hover:bg-teal-400 transition duration-200">
             Ir al Inicio
