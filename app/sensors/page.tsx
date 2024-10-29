@@ -19,6 +19,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 type HumidityData = {
   timestamp: string;
   humidity_value: number;
+  location: string; // Incluyendo el campo location como string
 };
 
 export default function SensorsPage() {
@@ -110,6 +111,7 @@ export default function SensorsPage() {
             <tr>
               <th className="border-b-2 border-gray-500 px-4 py-2">Hora</th>
               <th className="border-b-2 border-gray-500 px-4 py-2">Humedad (%)</th>
+              <th className="border-b-2 border-gray-500 px-4 py-2">Ubicación</th> {/* Nueva columna */}
             </tr>
           </thead>
           <tbody>
@@ -119,6 +121,7 @@ export default function SensorsPage() {
                   {new Date(item.timestamp).toLocaleTimeString()}
                 </td>
                 <td className="border-b border-gray-700 px-4 py-2">{item.humidity_value}</td>
+                <td className="border-b border-gray-700 px-4 py-2">{item.location}</td> {/* Nueva fila */}
               </tr>
             ))}
           </tbody>
