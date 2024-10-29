@@ -1,6 +1,20 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 export default function SensorsPage() {
   const [history, setHistory] = useState({
@@ -9,19 +23,16 @@ export default function SensorsPage() {
   });
 
   useEffect(() => {
-    // Función para obtener datos de la API y actualizar el gráfico
     async function fetchHumidityData() {
       try {
         const response = await fetch('/api/sensors');
         const data = await response.json();
 
-        // Extrae y transforma los datos para el gráfico
         const timestamps = data.map((entry: any) => new Date(entry.timestamp).toLocaleTimeString());
         const humidityValues = data.map((entry: any) => entry.humidity_value);
 
-        // Actualiza el estado con los nuevos datos
         setHistory({
-          timestamps: timestamps.slice(-10), // Últimos 10 valores
+          timestamps: timestamps.slice(-10),
           humidity: humidityValues.slice(-10),
         });
       } catch (error) {
@@ -29,11 +40,9 @@ export default function SensorsPage() {
       }
     }
 
-    // Llama a la función de obtención de datos al montar y cada 10 segundos
     fetchHumidityData();
     const interval = setInterval(fetchHumidityData, 10000);
 
-    // Limpia el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
   }, []);
 
