@@ -12,10 +12,7 @@ const client = new Client({
 // Variable de estado para asegurar conexión única
 let isConnected = false;
 
-/**
- * Función para conectar al cliente de PostgreSQL si no está conectado.
- * Solo realiza la conexión una vez.
- */
+// Función para conectar al cliente de PostgreSQL si no está conectado.
 async function connectClient() {
   if (!isConnected) {
     try {
@@ -28,11 +25,25 @@ async function connectClient() {
   }
 }
 
-/**
- * Manejador de solicitudes POST para insertar datos de humedad en la base de datos.
- * @param req La solicitud HTTP
- * @returns Respuesta JSON con los datos insertados o un mensaje de error
- */
+// Manejador de solicitudes GET para recuperar datos de humedad de la base de datos
+export async function GET() {
+  try {
+    // Asegura que el cliente esté conectado antes de ejecutar la consulta
+    await connectClient();
+
+    // Consulta SQL para obtener las últimas 10 entradas de humedad
+    const query = 'SELECT * FROM Humedad ORDER BY timestamp DESC LIMIT 10;';
+    const res = await client.query(query);
+
+    // Responde con los datos obtenidos en formato JSON
+    return NextResponse.json(res.rows);
+  } catch (err) {
+    console.error('❌ Error al obtener datos de la base de datos:', err);
+    return NextResponse.json({ error: 'Error al obtener datos' }, { status: 500 });
+  }
+}
+
+// Manejador de solicitudes POST para insertar datos de humedad en la base de datos
 export async function POST(req: Request) {
   try {
     // Asegura que el cliente esté conectado antes de ejecutar la consulta
