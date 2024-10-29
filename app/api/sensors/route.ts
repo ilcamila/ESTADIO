@@ -34,11 +34,22 @@ async function connectClient() {
  * @returns Respuesta JSON con los datos insertados o un mensaje de error
  */
 export async function POST(req: Request) {
-  const { humidity_value, location } = await req.json();
-
   try {
     // Asegura que el cliente esté conectado antes de ejecutar la consulta
     await connectClient();
+
+    // Verifica que la solicitud contenga JSON
+    const contentType = req.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json({ error: 'Content-Type debe ser application/json' }, { status: 400 });
+    }
+
+    // Extrae y valida los datos del cuerpo de la solicitud
+    const { humidity_value, location } = await req.json();
+
+    if (humidity_value === undefined || !location) {
+      return NextResponse.json({ error: 'Faltan datos: humidity_value o location' }, { status: 400 });
+    }
 
     // Consulta SQL para insertar los datos
     const query = `
