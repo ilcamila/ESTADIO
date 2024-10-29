@@ -16,6 +16,11 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+interface HumidityData {
+  timestamp: string;
+  humidity_value: number;
+}
+
 export default function SensorsPage() {
   const [history, setHistory] = useState({
     timestamps: [] as string[],
@@ -26,10 +31,10 @@ export default function SensorsPage() {
     async function fetchHumidityData() {
       try {
         const response = await fetch('/api/sensors');
-        const data = await response.json();
+        const data: HumidityData[] = await response.json();
 
-        const timestamps = data.map((entry: any) => new Date(entry.timestamp).toLocaleTimeString());
-        const humidityValues = data.map((entry: any) => entry.humidity_value);
+        const timestamps = data.map((entry) => new Date(entry.timestamp).toLocaleTimeString());
+        const humidityValues = data.map((entry) => entry.humidity_value);
 
         setHistory({
           timestamps: timestamps.slice(-10),
