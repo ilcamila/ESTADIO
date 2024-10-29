@@ -16,6 +16,14 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+// Define un tipo para los datos de la API
+type SensorData = {
+  id: number;
+  timestamp: string;
+  humidity_value: number;
+  location: string;
+};
+
 export default function SensorsPage() {
   const [history, setHistory] = useState({
     timestamps: [] as string[],
@@ -28,11 +36,11 @@ export default function SensorsPage() {
       const response = await fetch('/api/sensors', {
         method: 'GET',
       });
-      const data = await response.json();
+      const data: SensorData[] = await response.json();
 
       // Transformar los datos recibidos en un formato adecuado para el gráfico
-      const timestamps = data.map((item: any) => new Date(item.timestamp).toLocaleTimeString());
-      const humidityValues = data.map((item: any) => item.humidity_value);
+      const timestamps = data.map((item) => new Date(item.timestamp).toLocaleTimeString());
+      const humidityValues = data.map((item) => item.humidity_value);
 
       setHistory({
         timestamps: timestamps.slice(-10), // Limita a los últimos 10 datos
