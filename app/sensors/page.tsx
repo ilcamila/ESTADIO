@@ -16,6 +16,11 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+type HumidityData = {
+  timestamp: string;
+  humidity_value: number;
+};
+
 export default function SensorsPage() {
   const [history, setHistory] = useState({
     timestamps: [] as string[],
@@ -25,14 +30,16 @@ export default function SensorsPage() {
   useEffect(() => {
     async function fetchHumidityData() {
       const response = await fetch('/api/sensors');
-      const data = await response.json();
+      const data: HumidityData[] = await response.json();
 
       // Asegurar que los datos están ordenados del más viejo al más reciente
-      const sortedData = data.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      const sortedData = data.sort(
+        (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
 
       setHistory({
-        timestamps: sortedData.map((item: any) => new Date(item.timestamp).toLocaleTimeString()),
-        humidity: sortedData.map((item: any) => item.humidity_value),
+        timestamps: sortedData.map((item) => new Date(item.timestamp).toLocaleTimeString()),
+        humidity: sortedData.map((item) => item.humidity_value),
       });
     }
 
