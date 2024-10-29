@@ -26,25 +26,38 @@ export default function SensorsPage() {
     timestamps: [] as string[],
     humidity: [] as number[],
   });
-
   const [tableData, setTableData] = useState<HumidityData[]>([]);
 
   useEffect(() => {
     async function fetchHumidityData() {
-      const response = await fetch('/api/sensors');
-      const data: HumidityData[] = await response.json();
+      try {
+        const response = await fetch('/api/sensors');
+        if (!response.ok) {
+          console.error('Error en la respuesta de la API:', response.statusText);
+          return;
+        }
 
-      // Asegurar que los datos están ordenados del más viejo al más reciente
-      const sortedData = data.sort(
-        (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      );
+        const data: HumidityData[] = await response.json();
 
-      setHistory({
-        timestamps: sortedData.map((item) => new Date(item.timestamp).toLocaleTimeString()),
-        humidity: sortedData.map((item) => item.humidity_value),
-      });
+        // Verifica que cada valor de humedad sea un número válido
+        const validData = data.filter(
+          (item) => typeof item.humidity_value === 'number' && !isNaN(item.humidity_value)
+        );
 
-      setTableData(sortedData); // Actualiza los datos de la tabla
+        // Ordena los datos del más viejo al más reciente
+        const sortedData = validData.sort(
+          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+
+        setHistory({
+          timestamps: sortedData.map((item) => new Date(item.timestamp).toLocaleTimeString()),
+          humidity: sortedData.map((item) => item.humidity_value),
+        });
+
+        setTableData(sortedData);
+      } catch (error) {
+        console.error('Error al obtener datos de humedad:', error);
+      }
     }
 
     fetchHumidityData();
@@ -115,21 +128,21 @@ export default function SensorsPage() {
         </p>
         <Line data={data} options={options} />
         
-        {/* Tabla de datos de humedad */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-4 text-teal-300">Lecturas de Humedad</h2>
-          <table className="min-w-full bg-gray-800 rounded-lg">
+        {/* Tabla para mostrar los datos de humedad */}
+        <div className="mt-10">
+          <h2 className="text-2xl text-teal-300 mb-4">Historial de Mediciones</h2>
+          <table className="table-auto w-full text-gray-300">
             <thead>
               <tr>
-                <th className="py-2 px-4 text-gray-300">Hora</th>
-                <th className="py-2 px-4 text-gray-300">Humedad (%)</th>
+                <th className="px-4 py-2">Hora</th>
+                <th className="px-4 py-2">Humedad (%)</th>
               </tr>
             </thead>
             <tbody>
               {tableData.map((item, index) => (
-                <tr key={index} className="border-t border-gray-700">
-                  <td className="py-2 px-4 text-gray-400">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                  <td className="py-2 px-4 text-gray-400">{item.humidity_value.toFixed(2)}</td>
+                <tr key={index}>
+                  <td className="border px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
+                  <td className="border px-4 py-2">{item.humidity_value.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
