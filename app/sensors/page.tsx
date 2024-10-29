@@ -22,42 +22,19 @@ type HumidityData = {
 };
 
 export default function SensorsPage() {
-  const [history, setHistory] = useState({
-    timestamps: [] as string[],
-    humidity: [] as number[],
-  });
-  const [tableData, setTableData] = useState<HumidityData[]>([]);
+  const [history, setHistory] = useState<HumidityData[]>([]);
 
   useEffect(() => {
     async function fetchHumidityData() {
-      try {
-        const response = await fetch('/api/sensors');
-        if (!response.ok) {
-          console.error('Error en la respuesta de la API:', response.statusText);
-          return;
-        }
+      const response = await fetch('/api/sensors');
+      const data: HumidityData[] = await response.json();
 
-        const data: HumidityData[] = await response.json();
+      // Ordenar los datos para que el más antiguo esté a la izquierda y el más reciente a la derecha
+      const sortedData = data.sort(
+        (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
 
-        // Verifica que cada valor de humedad sea un número válido
-        const validData = data.filter(
-          (item) => typeof item.humidity_value === 'number' && !isNaN(item.humidity_value)
-        );
-
-        // Ordena los datos del más viejo al más reciente
-        const sortedData = validData.sort(
-          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
-
-        setHistory({
-          timestamps: sortedData.map((item) => new Date(item.timestamp).toLocaleTimeString()),
-          humidity: sortedData.map((item) => item.humidity_value),
-        });
-
-        setTableData(sortedData);
-      } catch (error) {
-        console.error('Error al obtener datos de humedad:', error);
-      }
+      setHistory(sortedData);
     }
 
     fetchHumidityData();
@@ -67,11 +44,11 @@ export default function SensorsPage() {
   }, []);
 
   const data = {
-    labels: history.timestamps,
+    labels: history.map(item => new Date(item.timestamp).toLocaleTimeString()),
     datasets: [
       {
         label: 'Humedad (%)',
-        data: history.humidity,
+        data: history.map(item => item.humidity_value),
         borderColor: 'rgb(75, 192, 192)',
         backgroundColor: 'rgba(75, 192, 192, 0.3)',
         borderWidth: 2,
@@ -127,28 +104,25 @@ export default function SensorsPage() {
           Observa las mediciones en tiempo real de humedad en porcentaje.
         </p>
         <Line data={data} options={options} />
-        
-        {/* Tabla para mostrar los datos de humedad */}
-        <div className="mt-10">
-          <h2 className="text-2xl text-teal-300 mb-4">Historial de Mediciones</h2>
-          <table className="table-auto w-full text-gray-300">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">Hora</th>
-                <th className="px-4 py-2">Humedad (%)</th>
+        <h2 className="text-2xl font-semibold mt-8 text-teal-300">Historial de Mediciones</h2>
+        <table className="w-full mt-4 text-gray-300">
+          <thead>
+            <tr>
+              <th className="border-b-2 border-gray-500 px-4 py-2">Hora</th>
+              <th className="border-b-2 border-gray-500 px-4 py-2">Humedad (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.map((item, index) => (
+              <tr key={index}>
+                <td className="border-b border-gray-700 px-4 py-2">
+                  {new Date(item.timestamp).toLocaleTimeString()}
+                </td>
+                <td className="border-b border-gray-700 px-4 py-2">{item.humidity_value}</td>
               </tr>
-            </thead>
-            <tbody>
-              {tableData.map((item, index) => (
-                <tr key={index}>
-                  <td className="border px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                  <td className="border px-4 py-2">{item.humidity_value.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+            ))}
+          </tbody>
+        </table>
         <div className="mt-8">
           <Link href="/" className="bg-teal-500 text-gray-900 font-medium text-lg px-8 py-3 rounded-lg shadow-md hover:bg-teal-400 transition duration-200">
             Ir al Inicio
