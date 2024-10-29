@@ -140,14 +140,14 @@ export default function SensorsPage() {
           src="campo_futbol.png" // Asegúrate de que esta imagen esté en tu carpeta 'public/'
           alt="Campo de fútbol"
           layout="responsive"
-          width={500}
-          height={300}
+          width={300}
+          height={200}
           className="rounded-lg shadow-md"
         />
         
         {/* Cuadro superior - Última lectura de humedad de Ubicación 1 */}
         <div className="absolute top-8 left-1/4 w-1/2 bg-teal-700 bg-opacity-75 rounded-lg p-4 text-center">
-          <h2 className="text-white text-lg font-semibold">Última Lectura de Humedad - Ubicación 1</h2>
+          <h2 className="text-white text-lg font-semibold">Humedad - Ubicación 1</h2>
           {latestReading ? (
             <p className="text-white text-2xl mt-2">
               {latestReading.humidity_value}% (Registrado a las {new Date(latestReading.timestamp).toLocaleTimeString()})
@@ -160,7 +160,7 @@ export default function SensorsPage() {
         {/* Cuadro inferior - Preparado para futura ESP */}
         <div className="absolute bottom-8 left-1/4 w-1/2 bg-gray-600 bg-opacity-50 rounded-lg p-4 text-center">
           <h2 className="text-white text-lg font-semibold">Próxima Ubicación</h2>
-          <p className="text-white text-sm">Pendiente de implementación...</p>
+          <p className="text-white text-sm">Pendiente de implementación para segunda etapa.</p>
         </div>
       </div>
 
