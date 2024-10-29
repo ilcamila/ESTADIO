@@ -16,12 +16,6 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-// Definir la interfaz para los datos obtenidos de la API
-interface HumidityData {
-  timestamp: string;
-  humidity_value: number;
-}
-
 export default function SensorsPage() {
   const [history, setHistory] = useState({
     timestamps: [] as string[],
@@ -30,29 +24,22 @@ export default function SensorsPage() {
 
   useEffect(() => {
     async function fetchHumidityData() {
-      try {
-        const response = await fetch('/api/sensors', {
-          method: 'GET',
-        });
+      const response = await fetch('/api/sensors');
+      const data = await response.json();
 
-        if (response.ok) {
-          const data: HumidityData[] = await response.json();
-          const timestamps = data.map((entry) => new Date(entry.timestamp).toLocaleTimeString());
-          const humidity = data.map((entry) => entry.humidity_value);
+      // Asegurar que los datos están ordenados del más viejo al más reciente
+      const sortedData = data.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-          setHistory({
-            timestamps,
-            humidity,
-          });
-        } else {
-          console.error('Error al obtener los datos de humedad:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error en la solicitud GET:', error);
-      }
+      setHistory({
+        timestamps: sortedData.map((item: any) => new Date(item.timestamp).toLocaleTimeString()),
+        humidity: sortedData.map((item: any) => item.humidity_value),
+      });
     }
 
     fetchHumidityData();
+    const interval = setInterval(fetchHumidityData, 10000); // Actualizar cada 10 segundos
+
+    return () => clearInterval(interval);
   }, []);
 
   const data = {
