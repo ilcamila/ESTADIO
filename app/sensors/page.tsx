@@ -16,13 +16,18 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+// Definir la interfaz para los datos obtenidos de la API
+interface HumidityData {
+  timestamp: string;
+  humidity_value: number;
+}
+
 export default function SensorsPage() {
   const [history, setHistory] = useState({
     timestamps: [] as string[],
     humidity: [] as number[],
   });
 
-  // Función para obtener los datos de humedad de la base de datos
   useEffect(() => {
     async function fetchHumidityData() {
       try {
@@ -31,9 +36,9 @@ export default function SensorsPage() {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          const timestamps = data.map((entry: any) => new Date(entry.timestamp).toLocaleTimeString());
-          const humidity = data.map((entry: any) => entry.humidity_value);
+          const data: HumidityData[] = await response.json();
+          const timestamps = data.map((entry) => new Date(entry.timestamp).toLocaleTimeString());
+          const humidity = data.map((entry) => entry.humidity_value);
 
           setHistory({
             timestamps,
@@ -47,7 +52,6 @@ export default function SensorsPage() {
       }
     }
 
-    // Llamar a la función para obtener los datos al montar el componente
     fetchHumidityData();
   }, []);
 
