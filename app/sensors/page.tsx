@@ -72,7 +72,7 @@ export default function SensorsPage() {
       },
       title: {
         display: true,
-        text: 'Mediciones de Humedad en Tiempo Real',
+        text: 'Mediciones de la Humedad en Tiempo Real',
         font: {
           size: 18,
         },
