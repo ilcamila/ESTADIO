@@ -90,33 +90,37 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Historial de Mediciones */}
-      <div className="bg-white bg-opacity-90 shadow-lg rounded-xl p-6 w-full max-w-4xl mb-10">
-        <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Historial de Humedad</h2>
-        <div className="overflow-auto max-h-60">
-          <table className="min-w-full text-gray-800">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 font-medium text-left">Hora</th>
-                <th className="px-4 py-2 font-medium text-left">Humedad (%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((item, index) => (
-                <tr key={index} className="even:bg-gray-100">
-                  <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                  <td className="px-4 py-2">{item.humidity_value}</td>
+      {/* Contenedor de dos columnas para historial y gráfica */}
+      <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
+        
+        {/* Historial de Mediciones */}
+        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
+          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Historial de Humedad</h2>
+          <div className="overflow-auto max-h-60">
+            <table className="min-w-full text-gray-800">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 font-medium text-left">Hora</th>
+                  <th className="px-4 py-2 font-medium text-left">Humedad (%)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {history.map((item, index) => (
+                  <tr key={index} className="even:bg-gray-100">
+                    <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
+                    <td className="px-4 py-2">{item.humidity_value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      {/* Gráfica de Humedad */}
-      <div className="bg-white bg-opacity-90 shadow-lg rounded-xl p-6 w-full max-w-4xl mb-10">
-        <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Gráfica de Humedad</h2>
-        <Line data={data} options={options} />
+        {/* Gráfica de Humedad */}
+        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
+          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Gráfica de Humedad</h2>
+          <Line data={data} options={options} />
+        </div>
       </div>
 
       {/* Pie de página con logos adicionales */}
