@@ -8,7 +8,7 @@ export default function HomePage() {
       <div className="w-full max-w-4xl text-center mb-12">
         <h1 className="text-6xl font-extrabold text-green-600 mb-4">Estadio Universidad de Cundinamarca</h1>
         <p className="text-lg text-gray-800 leading-relaxed italic">
-          "Donde el fútbol cobra vida y los sueños se hacen realidad"
+          &quot;Donde el fútbol cobra vida y los sueños se hacen realidad&quot;
         </p>
       </div>
 
@@ -29,7 +29,7 @@ export default function HomePage() {
         {/* Contenido principal en el centro */}
         <div className="text-center md:text-left md:w-2/3">
           <p className="text-xl text-green-700 mb-6 leading-relaxed italic">
-            "Donde cada partido es una batalla y cada gol, una victoria"
+            &quot;Donde cada partido es una batalla y cada gol, una victoria&quot;
           </p>
           {/* Enlace a la página de sensores */}
           <div className="flex justify-center md:justify-start">
