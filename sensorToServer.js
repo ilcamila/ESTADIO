@@ -3,7 +3,7 @@ const Readline = require('@serialport/parser-readline');
 const axios = require('axios');
 
 // Configura el puerto serial, asegúrate de usar el puerto correcto
-const port = new SerialPort('COM3', { baudRate: 9600 }); // Cambia 'COM3' al puerto correcto
+const port = new SerialPort('COM3', { baudRate: 115200 }); // Cambia 'COM3' al puerto correcto
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 // Cuando recibamos datos del Arduino
