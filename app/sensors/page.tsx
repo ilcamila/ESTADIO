@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Line } from 'react-chartjs-2';
 import {
@@ -20,12 +19,10 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 type HumidityData = {
   timestamp: string;
   humidity_value: number;
-  location: string;
 };
 
-export default function SensorsPage() {
+export default function HomePage() {
   const [history, setHistory] = useState<HumidityData[]>([]);
-  const [latestReading, setLatestReading] = useState<HumidityData | null>(null);
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -37,14 +34,9 @@ export default function SensorsPage() {
       );
 
       setHistory(sortedData);
-      const latestData = sortedData.filter((item) => item.location === "Ubicacion 1").pop();
-      setLatestReading(latestData || null);
     }
 
     fetchHumidityData();
-    const interval = setInterval(fetchHumidityData, 10000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const data = {
@@ -71,7 +63,7 @@ export default function SensorsPage() {
         display: true,
         text: 'Mediciones de Humedad en Tiempo Real',
         font: { size: 20 },
-        color: '#F3F4F6',
+        color: '#1F2937',
       },
     },
     scales: {
@@ -79,40 +71,41 @@ export default function SensorsPage() {
         beginAtZero: true,
         max: 100,
         grid: { color: 'rgba(255, 255, 255, 0.1)' },
-        title: { display: true, text: 'Humedad (%)', color: '#D1D5DB' },
+        title: { display: true, text: 'Humedad (%)', color: '#1F2937' },
       },
       x: {
         grid: { color: 'rgba(255, 255, 255, 0.1)' },
-        ticks: { color: '#D1D5DB' },
+        ticks: { color: '#1F2937' },
       },
     },
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-800 flex flex-col items-center p-8">
-      <div className="bg-gray-800 bg-opacity-90 shadow-2xl rounded-2xl p-10 w-full max-w-3xl text-center animate-fadeIn">
-        <h1 className="text-4xl font-bold mb-4 text-lime-300">Sensor de Humedad</h1>
-        <p className="text-md mb-6 text-gray-300">
-          Observa las mediciones de humedad en tiempo real.
+    <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
+      {/* Encabezado con el título central */}
+      <div className="w-full max-w-4xl text-center mb-12">
+        <h1 className="text-6xl font-extrabold text-green-600 mb-4">Estadio Universidad de Cundinamarca</h1>
+        <p className="text-lg text-gray-800 leading-relaxed italic">
+          &quot;Donde el fútbol cobra vida y los sueños se hacen realidad&quot;
         </p>
-        <Line data={data} options={options} />
+      </div>
 
-        <h2 className="text-2xl font-semibold mt-8 text-lime-300">Historial de Mediciones</h2>
-        <div className="overflow-auto max-h-48 mt-4 rounded-lg bg-gray-700 bg-opacity-50 shadow-inner">
-          <table className="min-w-full text-gray-200">
+      {/* Historial de Mediciones */}
+      <div className="bg-white bg-opacity-90 shadow-lg rounded-xl p-6 w-full max-w-4xl mb-10">
+        <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Historial de Humedad</h2>
+        <div className="overflow-auto max-h-60">
+          <table className="min-w-full text-gray-800">
             <thead>
               <tr>
-                <th className="px-4 py-2 font-medium text-gray-300">Hora</th>
-                <th className="px-4 py-2 font-medium text-gray-300">Humedad (%)</th>
-                <th className="px-4 py-2 font-medium text-gray-300">Ubicación</th>
+                <th className="px-4 py-2 font-medium text-left">Hora</th>
+                <th className="px-4 py-2 font-medium text-left">Humedad (%)</th>
               </tr>
             </thead>
             <tbody>
               {history.map((item, index) => (
-                <tr key={index} className="even:bg-gray-600">
+                <tr key={index} className="even:bg-gray-100">
                   <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
                   <td className="px-4 py-2">{item.humidity_value}</td>
-                  <td className="px-4 py-2">{item.location}</td>
                 </tr>
               ))}
             </tbody>
@@ -120,37 +113,27 @@ export default function SensorsPage() {
         </div>
       </div>
 
-      <div className="relative w-full max-w-4xl mt-12">
-        <Image
-          src="/campo_futbol.png"
-          alt="Campo de fútbol"
-          layout="responsive"
-          width={300}
-          height={200}
-          className="rounded-lg shadow-lg"
-        />
-
-        <div className="absolute top-8 left-1/4 w-1/2 bg-lime-800 bg-opacity-75 rounded-lg p-6 text-center shadow-md">
-          <h2 className="text-white text-lg font-semibold">Humedad - Ubicación 1</h2>
-          {latestReading ? (
-            <p className="text-white text-2xl mt-2 font-bold">
-              {latestReading.humidity_value}% (a las {new Date(latestReading.timestamp).toLocaleTimeString()})
-            </p>
-          ) : (
-            <p className="text-white">Cargando...</p>
-          )}
-        </div>
-
-        <div className="absolute bottom-8 left-1/4 w-1/2 bg-gray-600 bg-opacity-50 rounded-lg p-4 text-center shadow-md">
-          <h2 className="text-white text-lg font-semibold">Próxima Ubicación</h2>
-          <p className="text-white text-sm">Pendiente de implementación en fase 2.</p>
-        </div>
+      {/* Gráfica de Humedad */}
+      <div className="bg-white bg-opacity-90 shadow-lg rounded-xl p-6 w-full max-w-4xl mb-10">
+        <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Gráfica de Humedad</h2>
+        <Line data={data} options={options} />
       </div>
 
-      <div className="mt-10">
-        <Link href="/" className="bg-lime-500 text-gray-900 font-semibold text-lg px-8 py-3 rounded-full shadow-lg hover:bg-lime-400 transition duration-200">
-          Volver al Inicio
-        </Link>
+      {/* Pie de página con logos adicionales */}
+      <div className="flex flex-col sm:flex-row items-center justify-center w-full max-w-6xl mt-16">
+        <div className="flex items-center justify-center mb-8 sm:mb-0 sm:mr-8">
+          <Image
+            src="/Logo_Universidad_de_Cundinamarca.png"
+            alt="Logo Universidad de Cundinamarca"
+            width={100}
+            height={100}
+            className="rounded-full shadow-lg border-2 border-green-600 transform hover:rotate-6 transition-transform duration-300"
+          />
+        </div>
+        <div className="text-center sm:text-left text-gray-600">
+          <p className="text-sm">Universidad de Cundinamarca</p>
+          <p className="text-xs italic">Apoyando el desarrollo deportivo y el espíritu competitivo.</p>
+        </div>
       </div>
     </div>
   );
