@@ -17,8 +17,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Error al obtener datos' }, { status: 500 });
   }
 }
-
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const contentType = req.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
@@ -36,7 +35,7 @@ export async function POST(req) {
       RETURNING *;
     `;
     const values = [humidity_value, location];
-    const res = await pool.query(query, values); // Ejecuta la inserción directamente en el pool
+    const res = await pool.query(query, values);
 
     console.log("✅ Datos insertados con éxito:", res.rows[0]);
     return NextResponse.json(res.rows[0]);
