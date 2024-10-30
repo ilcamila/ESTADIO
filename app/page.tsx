@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { sql } from "@vercel/postgres";
 
 export default function HomePage() {
   return (
