@@ -32,7 +32,7 @@ export default function HomePage() {
             Explora el monitoreo detallado de las condiciones del estadio con nuestros sensores de última tecnología.
           </p>
           <p className="text-sm text-gray-400 italic mb-6">
-            "Asegurando la mejor experiencia para cada visitante en el Estadio UDEC"
+            &quot;Asegurando la mejor experiencia para cada visitante en el Estadio UDEC&quot;
           </p>
           {/* Enlace a la página de sensores */}
           <div className="flex justify-center md:justify-start">
