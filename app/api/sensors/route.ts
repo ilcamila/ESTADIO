@@ -21,7 +21,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) { // Asegúrate de que req sea del tipo Request
+export async function POST(req: Request) {
   try {
     await client.connect();
 
@@ -52,6 +52,6 @@ export async function POST(req: Request) { // Asegúrate de que req sea del tipo
   } catch (err) {
     console.error('❌ Error al insertar datos en la base de datos:', err);
     await client.end();
-    return NextResponse.json({ error: 'Error al insertar datos' }, { status: 500 });
-  }
+    return NextResponse.json({ error: 'Error al insertar datos' }, { status: 500 });
+  }
 }
