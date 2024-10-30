@@ -25,22 +25,17 @@ async function connectClient() {
   }
 }
 
-// Función para generar datos aleatorios de humedad y ubicación
-function generateRandomHumidityData() {
-  const humidityValue = Math.floor(Math.random() * 101); // Genera un valor entre 0 y 100
-  const locations = ["Estadio", "Casa", "Oficina", "Parque"];
-  const location = locations[Math.floor(Math.random() * locations.length)]; // Selecciona una ubicación aleatoria
-
-  return { humidity_value: humidityValue, location };
-}
-
 // Manejador de solicitudes GET para recuperar datos de humedad de la base de datos
 export async function GET() {
   try {
+    // Asegura que el cliente esté conectado antes de ejecutar la consulta
     await connectClient();
+
+    // Consulta SQL para obtener las últimas 10 entradas de humedad
     const query = 'SELECT * FROM Humedad ORDER BY timestamp DESC LIMIT 10;';
     const res = await client.query(query);
 
+    // Responde con los datos obtenidos en formato JSON
     return NextResponse.json(res.rows);
   } catch (err) {
     console.error('❌ Error al obtener datos de la base de datos:', err);
@@ -51,10 +46,21 @@ export async function GET() {
 // Manejador de solicitudes POST para insertar datos de humedad en la base de datos
 export async function POST(req: Request) {
   try {
+    // Asegura que el cliente esté conectado antes de ejecutar la consulta
     await connectClient();
 
-    // Generar datos aleatorios
-    const { humidity_value, location } = generateRandomHumidityData();
+    // Verifica que la solicitud contenga JSON
+    const contentType = req.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json({ error: 'Content-Type debe ser application/json' }, { status: 400 });
+    }
+
+    // Extrae y valida los datos del cuerpo de la solicitud
+    const { humidity_value, location } = await req.json();
+
+    if (humidity_value === undefined || !location) {
+      return NextResponse.json({ error: 'Faltan datos: humidity_value o location' }, { status: 400 });
+    }
 
     // Consulta SQL para insertar los datos
     const query = `
@@ -65,8 +71,10 @@ export async function POST(req: Request) {
     const values = [humidity_value, location];
     const res = await client.query(query, values);
 
+    // Responde con los datos insertados en formato JSON
     console.log("✅ Datos insertados con éxito:", res.rows[0]);
     return NextResponse.json(res.rows[0]);
+
   } catch (err) {
     console.error('❌ Error al insertar datos en la base de datos:', err);
     return NextResponse.json({ error: 'Error al insertar datos' }, { status: 500 });

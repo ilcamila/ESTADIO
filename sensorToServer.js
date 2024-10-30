@@ -12,7 +12,7 @@ parser.on('data', async (data) => {
 
   try {
     // Enviar los datos a tu API en Next.js
-    await axios.post('https://estadio.vercel.app/sensors', {
+    await axios.post('https://estadio-dashboard.vercel.app/sensors', {
       distance: parseFloat(data) // Convierte el dato a número
     });
     console.log('Dato enviado al servidor');
