@@ -2,19 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 type HumidityData = {
   timestamp: string;
@@ -23,6 +10,7 @@ type HumidityData = {
 
 export default function HomePage() {
   const [history, setHistory] = useState<HumidityData[]>([]);
+  const [latestReading, setLatestReading] = useState<HumidityData | null>(null);
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -34,51 +22,11 @@ export default function HomePage() {
       );
 
       setHistory(sortedData);
+      setLatestReading(sortedData[sortedData.length - 1] || null); // Guarda el último dato de humedad
     }
 
     fetchHumidityData();
   }, []);
-
-  const data = {
-    labels: history.map((item) => new Date(item.timestamp).toLocaleTimeString()),
-    datasets: [
-      {
-        label: 'Humedad (%)',
-        data: history.map((item) => item.humidity_value),
-        borderColor: '#4ADE80',
-        backgroundColor: 'rgba(74, 222, 128, 0.2)',
-        borderWidth: 3,
-        pointBackgroundColor: 'rgba(255, 255, 255, 0.9)',
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: 'Mediciones de Humedad en Tiempo Real',
-        font: { size: 20 },
-        color: '#1F2937',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 100,
-        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-        title: { display: true, text: 'Humedad (%)', color: '#1F2937' },
-      },
-      x: {
-        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-        ticks: { color: '#1F2937' },
-      },
-    },
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
@@ -90,7 +38,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Contenedor de dos columnas para historial y gráfica */}
+      {/* Contenedor de dos columnas para historial y última lectura */}
       <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
         
         {/* Historial de Mediciones */}
@@ -116,10 +64,19 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Gráfica de Humedad */}
-        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
-          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Gráfica de Humedad</h2>
-          <Line data={data} options={options} />
+        {/* Cuadro de Visualización del Último Dato de Humedad */}
+        <div className="flex-1 bg-green-600 bg-opacity-90 shadow-lg rounded-xl p-8 flex flex-col items-center justify-center">
+          <h2 className="text-3xl font-semibold text-white mb-4">Último Dato de Humedad</h2>
+          {latestReading ? (
+            <div className="text-center text-white">
+              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}%</p>
+              <p className="text-lg">
+                Registrado a las {new Date(latestReading.timestamp).toLocaleTimeString()}
+              </p>
+            </div>
+          ) : (
+            <p className="text-lg text-white">Cargando...</p>
+          )}
         </div>
       </div>
 
