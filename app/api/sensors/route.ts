@@ -64,7 +64,7 @@ export async function POST(req: Request) {
 
     // Consulta SQL para insertar los datos
     const query = `
-      INSERT INTO Humedad (humidity_value, location)
+      INSERT INTO humedad (humidity_value, location)
       VALUES ($1, $2)
       RETURNING *;
     `;
