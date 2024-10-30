@@ -137,7 +137,7 @@ export default function SensorsPage() {
       <div className="relative w-full max-w-4xl mt-10">
         {/* Imagen de fondo del campo */}
         <Image
-          src="campo_futbol.png" // Asegúrate de que esta imagen esté en tu carpeta 'public/'
+          src="/campo_futbol.png" // Asegúrate de que esta imagen esté en tu carpeta 'public/'
           alt="Campo de fútbol"
           layout="responsive"
           width={300}

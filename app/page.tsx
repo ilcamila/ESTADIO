@@ -8,7 +8,7 @@ export default function HomePage() {
         {/* Imagen del Logo Izquierdo */}
         <div className="flex items-center justify-center">
           <Image
-            src="Logo_Universidad_de_Cundinamarca.png"
+            src="/Logo_Universidad_de_Cundinamarca.png"
             alt="Logo Universidad de Cundinamarca"
             width={400} // Tamaño ajustable
             height={400}
@@ -52,7 +52,7 @@ export default function HomePage() {
         {/* Imagen del Logo Derecho */}
         <div className="flex items-center justify-center">
           <Image
-            src="Logo_Universidad_de_Cundinamarca.png"
+            src="/Logo_Universidad_de_Cundinamarca.png"
             alt="Logo Universidad de Cundinamarca"
             width={400} // Tamaño ajustable
             height={400}
