@@ -49,7 +49,7 @@ export default function HomePage() {
               <thead>
                 <tr>
                   <th className="px-4 py-2 font-medium text-left">Hora</th>
-                  <th className="px-4 py-2 font-medium text-left">Humedad (%)</th>
+                  <th className="px-4 py-2 font-medium text-left">Humedad</th>
                 </tr>
               </thead>
               <tbody>
@@ -64,12 +64,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Cuadro de Visualización del Último Dato de Humedad */}
+        {/* Cuadro de Visualización de Humedad Actual */}
         <div className="flex-1 bg-green-600 bg-opacity-90 shadow-lg rounded-xl p-8 flex flex-col items-center justify-center">
-          <h2 className="text-3xl font-semibold text-white mb-4">Último Dato de Humedad</h2>
+          <h2 className="text-3xl font-semibold text-white mb-4">Humedad Actual</h2>
           {latestReading ? (
             <div className="text-center text-white">
-              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}%</p>
+              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}</p>
               <p className="text-lg">
                 Registrado a las {new Date(latestReading.timestamp).toLocaleTimeString()}
               </p>
