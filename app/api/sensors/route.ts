@@ -38,7 +38,6 @@ function generateRandomHumidityData() {
 export async function GET() {
   try {
     await connectClient();
-
     const query = 'SELECT * FROM Humedad ORDER BY timestamp DESC LIMIT 10;';
     const res = await client.query(query);
 
