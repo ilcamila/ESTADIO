@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import HumidityChart from './components/HumidityChart';
 
 type HumidityData = {
   timestamp: string;
@@ -23,17 +22,22 @@ export default function HomePage() {
       );
 
       setHistory(sortedData);
-      setLatestReading(sortedData[sortedData.length - 1] || null);
+      setLatestReading(sortedData[sortedData.length - 1] || null); // Guarda el último dato de humedad
     }
 
+    // Llamar a la función de obtención de datos por primera vez
     fetchHumidityData();
+
+    // Establecer un intervalo para actualizar automáticamente cada 30 segundos
     const interval = setInterval(fetchHumidityData, 30000);
+
+    // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
-      {/* Encabezado */}
+      {/* Encabezado con el título central */}
       <div className="w-full max-w-4xl text-center mb-12">
         <h1 className="text-6xl font-extrabold text-green-600 mb-4">Estadio Universidad de Cundinamarca</h1>
         <p className="text-lg text-gray-800 leading-relaxed italic">
@@ -41,7 +45,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Contenedor para historial, última lectura y gráfica */}
+      {/* Contenedor de dos columnas para historial y última lectura */}
       <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
         
         {/* Historial de Mediciones */}
@@ -83,12 +87,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Gráfica de Humedad */}
-      <div className="w-full max-w-6xl mt-10">
-        <h2 className="text-3xl font-semibold text-green-700 text-center mb-4">Gráfica de Humedad</h2>
-        <HumidityChart history={history} />
-      </div>
-
       {/* Pie de página con logos adicionales */}
       <div className="flex flex-col sm:flex-row items-center justify-center w-full max-w-6xl mt-16">
         <div className="flex items-center justify-center mb-8 sm:mb-0 sm:mr-8">
@@ -107,4 +105,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-}
+} 
