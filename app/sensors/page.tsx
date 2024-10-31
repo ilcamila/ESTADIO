@@ -25,7 +25,14 @@ export default function HomePage() {
       setLatestReading(sortedData[sortedData.length - 1] || null); // Guarda el último dato de humedad
     }
 
+    // Llamar a la función de obtención de datos por primera vez
     fetchHumidityData();
+
+    // Establecer un intervalo para actualizar automáticamente cada 30 segundos
+    const interval = setInterval(fetchHumidityData, 30000);
+
+    // Limpiar el intervalo cuando el componente se desmonta
+    return () => clearInterval(interval);
   }, []);
 
   return (
