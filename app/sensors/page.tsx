@@ -87,6 +87,34 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Representación Adicional */}
+      <div className="flex flex-col items-center w-full max-w-6xl mt-10">
+        {/* Barra de Progreso */}
+        <div className="w-full bg-gray-300 rounded-full h-6 mb-8">
+          <div
+            className="bg-green-600 h-6 rounded-full"
+            style={{ width: `${latestReading ? latestReading.humidity_value : 0}%` }}
+          ></div>
+        </div>
+        <p className="text-lg text-gray-700 text-center mb-8">
+          Nivel de Humedad en Barra de Progreso
+        </p>
+
+        {/* Icono de Gota de Agua */}
+        <div className="flex flex-col items-center">
+          <div
+            className="w-16 h-16 rounded-full bg-blue-500 text-white flex items-center justify-center"
+            style={{
+              transform: `scale(${latestReading ? latestReading.humidity_value / 100 : 0.5})`, // Escala proporcional a la humedad
+              transition: 'transform 0.3s ease-in-out',
+            }}
+          >
+            💧
+          </div>
+          <p className="text-lg text-gray-700 mt-4">Representación de Humedad en Icono</p>
+        </div>
+      </div>
+
       {/* Pie de página con logos adicionales */}
       <div className="flex flex-col sm:flex-row items-center justify-center w-full max-w-6xl mt-16">
         <div className="flex items-center justify-center mb-8 sm:mb-0 sm:mr-8">
