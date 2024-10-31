@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import HumidityChart from './components/HumidityChart';
 
 type HumidityData = {
   timestamp: string;
   humidity_value: number;
 };
 
-export default function SensorsPage() {
+export default function HomePage() {
   const [history, setHistory] = useState<HumidityData[]>([]);
   const [latestReading, setLatestReading] = useState<HumidityData | null>(null);
 
@@ -23,25 +22,33 @@ export default function SensorsPage() {
       );
 
       setHistory(sortedData);
-      setLatestReading(sortedData[sortedData.length - 1] || null);
+      setLatestReading(sortedData[sortedData.length - 1] || null); // Guarda el último dato de humedad
     }
 
+    // Llamar a la función de obtención de datos por primera vez
     fetchHumidityData();
+
+    // Establecer un intervalo para actualizar automáticamente cada 30 segundos
     const interval = setInterval(fetchHumidityData, 30000);
+
+    // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
+      {/* Encabezado con el título central */}
       <div className="w-full max-w-4xl text-center mb-12">
         <h1 className="text-6xl font-extrabold text-green-600 mb-4">Estadio Universidad de Cundinamarca</h1>
         <p className="text-lg text-gray-800 leading-relaxed italic">
-          &quot;Monitoreo de Humedad del Terreno&quot;
+          &quot;Donde el fútbol cobra vida y los sueños se hacen realidad&quot;
         </p>
       </div>
 
+      {/* Contenedor de dos columnas para historial y última lectura */}
       <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
         
+        {/* Historial de Mediciones */}
         <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
           <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Historial de Humedad</h2>
           <div className="overflow-auto max-h-60">
@@ -49,14 +56,14 @@ export default function SensorsPage() {
               <thead>
                 <tr>
                   <th className="px-4 py-2 font-medium text-left">Hora</th>
-                  <th className="px-4 py-2 font-medium text-left">Humedad (%)</th>
+                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th> {/* Cambiado a % HR */}
                 </tr>
               </thead>
               <tbody>
                 {history.map((item, index) => (
                   <tr key={index} className="even:bg-gray-100">
                     <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                    <td className="px-4 py-2">{item.humidity_value}%</td>
+                    <td className="px-4 py-2">{item.humidity_value}% HR</td> {/* Agregamos % HR */}
                   </tr>
                 ))}
               </tbody>
@@ -64,11 +71,12 @@ export default function SensorsPage() {
           </div>
         </div>
 
+        {/* Cuadro de Visualización de Humedad Actual */}
         <div className="flex-1 bg-green-600 bg-opacity-90 shadow-lg rounded-xl p-8 flex flex-col items-center justify-center">
           <h2 className="text-3xl font-semibold text-white mb-4">Humedad Actual</h2>
           {latestReading ? (
             <div className="text-center text-white">
-              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}%</p>
+              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}% HR</p> {/* Agregamos % HR */}
               <p className="text-lg">
                 Registrado a las {new Date(latestReading.timestamp).toLocaleTimeString()}
               </p>
@@ -79,9 +87,21 @@ export default function SensorsPage() {
         </div>
       </div>
 
-      <div className="w-full max-w-6xl mt-10">
-        <h2 className="text-3xl font-semibold text-green-700 text-center mb-4">Gráfica de Humedad</h2>
-        <HumidityChart history={history} />
+      {/* Pie de página con logos adicionales */}
+      <div className="flex flex-col sm:flex-row items-center justify-center w-full max-w-6xl mt-16">
+        <div className="flex items-center justify-center mb-8 sm:mb-0 sm:mr-8">
+          <Image
+            src="/Logo_Universidad_de_Cundinamarca.png"
+            alt="Logo Universidad de Cundinamarca"
+            width={100}
+            height={100}
+            className="rounded-full shadow-lg border-2 border-green-600 transform hover:rotate-6 transition-transform duration-300"
+          />
+        </div>
+        <div className="text-center sm:text-left text-gray-600">
+          <p className="text-sm">Universidad de Cundinamarca</p>
+          <p className="text-xs italic">Apoyando el desarrollo deportivo y el espíritu competitivo.</p>
+        </div>
       </div>
     </div>
   );
