@@ -56,14 +56,14 @@ export default function HomePage() {
               <thead>
                 <tr>
                   <th className="px-4 py-2 font-medium text-left">Hora</th>
-                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th> {/* Cambiado a % HR */}
+                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((item, index) => (
                   <tr key={index} className="even:bg-gray-100">
                     <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                    <td className="px-4 py-2">{item.humidity_value}% HR</td> {/* Agregamos % HR */}
+                    <td className="px-4 py-2">{item.humidity_value}% HR</td>
                   </tr>
                 ))}
               </tbody>
@@ -76,7 +76,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-semibold text-white mb-4">Humedad Actual</h2>
           {latestReading ? (
             <div className="text-center text-white">
-              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}% HR</p> {/* Agregamos % HR */}
+              <p className="text-5xl font-bold mb-2">{latestReading.humidity_value}% HR</p>
               <p className="text-lg">
                 Registrado a las {new Date(latestReading.timestamp).toLocaleTimeString()}
               </p>
@@ -89,12 +89,19 @@ export default function HomePage() {
 
       {/* Representación Adicional */}
       <div className="flex flex-col items-center w-full max-w-6xl mt-10">
-        {/* Barra de Progreso */}
-        <div className="w-full bg-gray-300 rounded-full h-6 mb-8">
+        {/* Barra de Progreso Estética */}
+        <div className="w-full max-w-lg bg-gray-300 rounded-full h-8 mb-4 relative overflow-hidden shadow-md">
           <div
-            className="bg-green-600 h-6 rounded-full"
-            style={{ width: `${latestReading ? latestReading.humidity_value : 0}%` }}
+            className="h-8 rounded-full"
+            style={{
+              width: `${latestReading ? latestReading.humidity_value : 0}%`,
+              background: 'linear-gradient(90deg, #3b82f6, #22c55e)',
+              transition: 'width 0.4s ease',
+            }}
           ></div>
+          <span className="absolute inset-0 flex items-center justify-center text-white font-semibold">
+            {latestReading ? `${latestReading.humidity_value}% HR` : 'Cargando...'}
+          </span>
         </div>
         <p className="text-lg text-gray-700 text-center mb-8">
           Nivel de Humedad en Barra de Progreso
@@ -105,7 +112,7 @@ export default function HomePage() {
           <div
             className="w-16 h-16 rounded-full bg-blue-500 text-white flex items-center justify-center"
             style={{
-              transform: `scale(${latestReading ? latestReading.humidity_value / 100 : 0.5})`, // Escala proporcional a la humedad
+              transform: `scale(${latestReading ? latestReading.humidity_value / 100 : 0.5})`,
               transition: 'transform 0.3s ease-in-out',
             }}
           >
