@@ -12,8 +12,10 @@ type HumidityData = {
 export default function HomePage() {
   const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
   const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
+  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]);
   const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
   const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
+  const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
 
   useEffect(() => {
@@ -24,26 +26,34 @@ export default function HomePage() {
       // Filtrar datos por ubicación
       const centerData = data.filter(item => item.location === 'centro');
       const goalRightData = data.filter(item => item.location === 'porteriaderecha');
+      const goalLeftData = data.filter(item => item.location === 'porteriaizquierda');
 
       // Ordenar datos por timestamp
       centerData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       goalRightData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      goalLeftData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
       // Actualizar el historial añadiendo datos nuevos
       setCenterHistory(prev => [...prev, ...centerData]);
       setGoalRightHistory(prev => [...prev, ...goalRightData]);
+      setGoalLeftHistory(prev => [...prev, ...goalLeftData]);
 
       // Últimas lecturas
       const lastCenterReading = centerData[centerData.length - 1] || null;
       const lastGoalRightReading = goalRightData[goalRightData.length - 1] || null;
+      const lastGoalLeftReading = goalLeftData[goalLeftData.length - 1] || null;
 
       setLatestCenterReading(lastCenterReading);
       setLatestGoalRightReading(lastGoalRightReading);
+      setLatestGoalLeftReading(lastGoalLeftReading);
 
       // Calcular promedio
-      if (lastCenterReading && lastGoalRightReading) {
+      if (lastCenterReading && lastGoalRightReading && lastGoalLeftReading) {
         setAverageHumidity(
-          (lastCenterReading.humidity_value + lastGoalRightReading.humidity_value) / 2
+          (lastCenterReading.humidity_value +
+            lastGoalRightReading.humidity_value +
+            lastGoalLeftReading.humidity_value) /
+            3
         );
       }
     }
@@ -68,7 +78,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Contenedor de dos tablas */}
+      {/* Contenedor de tablas */}
       <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
         {/* Tabla de Humedad del Centro */}
         <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
@@ -106,6 +116,29 @@ export default function HomePage() {
               </thead>
               <tbody>
                 {goalRightHistory.map((item, index) => (
+                  <tr key={index} className="even:bg-gray-100">
+                    <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
+                    <td className="px-4 py-2">{item.humidity_value}% HR</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Tabla de Humedad de la Portería Izquierda */}
+        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
+          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Humedad - Portería Izquierda</h2>
+          <div className="overflow-auto max-h-60">
+            <table className="min-w-full text-gray-800">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 font-medium text-left">Hora</th>
+                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {goalLeftHistory.map((item, index) => (
                   <tr key={index} className="even:bg-gray-100">
                     <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
                     <td className="px-4 py-2">{item.humidity_value}% HR</td>
