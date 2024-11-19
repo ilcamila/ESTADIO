@@ -14,6 +14,7 @@ export default function HomePage() {
   const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
   const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
   const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
+  const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -28,11 +29,23 @@ export default function HomePage() {
       centerData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       goalRightData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-      // Actualizar el estado
-      setCenterHistory(centerData);
-      setGoalRightHistory(goalRightData);
-      setLatestCenterReading(centerData[centerData.length - 1] || null);
-      setLatestGoalRightReading(goalRightData[goalRightData.length - 1] || null);
+      // Actualizar el historial añadiendo datos nuevos
+      setCenterHistory(prev => [...prev, ...centerData]);
+      setGoalRightHistory(prev => [...prev, ...goalRightData]);
+
+      // Últimas lecturas
+      const lastCenterReading = centerData[centerData.length - 1] || null;
+      const lastGoalRightReading = goalRightData[goalRightData.length - 1] || null;
+
+      setLatestCenterReading(lastCenterReading);
+      setLatestGoalRightReading(lastGoalRightReading);
+
+      // Calcular promedio
+      if (lastCenterReading && lastGoalRightReading) {
+        setAverageHumidity(
+          (lastCenterReading.humidity_value + lastGoalRightReading.humidity_value) / 2
+        );
+      }
     }
 
     // Llamar a la función de obtención de datos por primera vez
@@ -100,6 +113,29 @@ export default function HomePage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Promedio de Humedad */}
+      <div className="w-full max-w-lg bg-green-600 bg-opacity-90 shadow-lg rounded-xl p-8 mt-12 text-center">
+        <h2 className="text-3xl font-semibold text-white mb-4">Promedio de Humedad</h2>
+        <div className="text-center text-white">
+          <p className="text-5xl font-bold mb-2">
+            {averageHumidity !== null ? `${averageHumidity.toFixed(2)}% HR` : 'Cargando...'}
+          </p>
+          <div className="w-full bg-gray-300 rounded-full h-8 mt-4 relative overflow-hidden shadow-md">
+            <div
+              className="h-8 rounded-full"
+              style={{
+                width: `${averageHumidity !== null ? averageHumidity : 0}%`,
+                background: 'linear-gradient(90deg, #3b82f6, #22c55e)',
+                transition: 'width 0.4s ease',
+              }}
+            ></div>
+            <span className="absolute inset-0 flex items-center justify-center text-white font-semibold">
+              {averageHumidity !== null ? `${averageHumidity.toFixed(2)}% HR` : 'Cargando...'}
+            </span>
           </div>
         </div>
       </div>
