@@ -66,6 +66,25 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Función para determinar el tipo de guayo basado en la humedad promedio
+  const getCleatsType = (humidity: number | null) => {
+    if (humidity === null) return 'Cargando...';
+
+    if (humidity < 10) {
+      return 'Firm Ground (FG): Taches cortos';
+    } else if (humidity >= 10 && humidity <= 30) {
+      return 'Firm Ground (FG) o Hybrid Ground';
+    } else if (humidity > 30 && humidity <= 60) {
+      return 'Soft Ground (SG): Taches largos';
+    } else if (humidity > 60) {
+      return 'Soft Ground (SG): Taches largos';
+    } else {
+      return 'Césped sintético: Artificial Ground (AG) con taches cortos';
+    }
+  };
+
+  const cleatsRecommendation = getCleatsType(averageHumidity);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
       {/* Encabezado */}
@@ -156,12 +175,15 @@ export default function HomePage() {
         <p>Portería Izquierda: {latestGoalLeftReading ? `${latestGoalLeftReading.humidity_value}% HR` : 'Sin datos'}</p>
       </div>
 
-      {/* Promedio de Humedad */}
+      {/* Promedio de Humedad y Recomendación de Guayos */}
       <div className="w-full max-w-lg bg-green-600 bg-opacity-90 shadow-lg rounded-xl p-8 mt-12 text-center">
-        <h2 className="text-3xl font-semibold text-white mb-4">Promedio de Humedad</h2>
+        <h2 className="text-3xl font-semibold text-white mb-4">Promedio de Humedad y Recomendación de Guayos</h2>
         <div className="text-center text-white">
           <p className="text-5xl font-bold mb-2">
             {averageHumidity !== null ? `${averageHumidity.toFixed(2)}% HR` : 'Cargando...'}
+          </p>
+          <p className="text-2xl font-semibold mb-4">
+            {cleatsRecommendation}
           </p>
           <div className="w-full bg-gray-300 rounded-full h-8 mt-4 relative overflow-hidden shadow-md">
             <div
