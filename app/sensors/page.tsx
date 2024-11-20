@@ -51,8 +51,7 @@ export default function HomePage() {
         setAverageHumidity(
           (lastCenterReading.humidity_value +
             lastGoalRightReading.humidity_value +
-            lastGoalLeftReading.humidity_value) /
-            3
+            lastGoalLeftReading.humidity_value) / 3
         );
       }
     }
@@ -69,7 +68,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
-      {/* Encabezado con el título central */}
+      {/* Encabezado */}
       <div className="w-full max-w-4xl text-center mb-12">
         <h1 className="text-6xl font-extrabold text-green-600 mb-4">Estadio Universidad de Cundinamarca</h1>
         <p className="text-lg text-gray-800 leading-relaxed italic">
@@ -77,7 +76,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Contenedor de tablas */}
+      {/* Tablas de datos */}
       <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
         {/* Tabla de Humedad del Centro */}
         <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
@@ -147,6 +146,14 @@ export default function HomePage() {
             </table>
           </div>
         </div>
+      </div>
+
+      {/* Últimas lecturas */}
+      <div className="w-full max-w-lg bg-white shadow-lg rounded-xl p-6 mt-12 text-center">
+        <h2 className="text-3xl font-semibold text-gray-700 mb-4">Últimas Lecturas</h2>
+        <p>Centro: {latestCenterReading ? `${latestCenterReading.humidity_value}% HR` : 'Sin datos'}</p>
+        <p>Portería Derecha: {latestGoalRightReading ? `${latestGoalRightReading.humidity_value}% HR` : 'Sin datos'}</p>
+        <p>Portería Izquierda: {latestGoalLeftReading ? `${latestGoalLeftReading.humidity_value}% HR` : 'Sin datos'}</p>
       </div>
 
       {/* Promedio de Humedad */}
