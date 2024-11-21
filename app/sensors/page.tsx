@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link'; // Importar Link para redirigir a la página de la gráfica
 
 type HumidityData = {
   timestamp: string;
@@ -8,7 +9,7 @@ type HumidityData = {
   location: string;
 };
 
-export default function ViewData() {
+export default function Page() {
   const [allData, setAllData] = useState<HumidityData[]>([]);
   const [filteredData, setFilteredData] = useState<HumidityData[]>([]);
 
@@ -30,6 +31,16 @@ export default function ViewData() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
+      {/* Botón para ir a la página de la gráfica */}
+      <div className="absolute top-6 right-6">
+        <Link href="/graph">
+          <button className="bg-green-600 text-white text-lg font-semibold px-6 py-3 rounded-lg hover:bg-green-500 transition-all duration-300">
+            Ver Gráfica y Recomendación
+          </button>
+        </Link>
+      </div>
+
+      {/* Encabezado */}
       <h1 className="text-6xl font-extrabold text-green-600 mb-6">Filtrar Datos de Humedad</h1>
       <div className="flex space-x-4 mb-6">
         <button
