@@ -14,8 +14,6 @@ type HumidityData = {
 
 export default function HomePage() {
   const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
-  const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
-  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]); // Elimina si no lo necesitas
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
   const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
 
@@ -26,36 +24,24 @@ export default function HomePage() {
 
       // Filtrar datos por ubicación
       const centerData = data.filter(item => item.location === 'centro');
-      const goalRightData = data.filter(item => item.location === 'porteriaderecha');
-      const goalLeftData = data.filter(item => item.location === 'porteriaizquierda');
 
       // Ordenar datos por timestamp
       centerData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      goalRightData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      goalLeftData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
       // Actualizar el historial añadiendo datos nuevos
       setCenterHistory(prev => [...prev, ...centerData]);
-      setGoalRightHistory(prev => [...prev, ...goalRightData]);
-      setGoalLeftHistory(prev => [...prev, ...goalLeftData]);
 
       // Calcular promedio de humedad
       const lastCenterReading = centerData[centerData.length - 1] || null;
-      const lastGoalRightReading = goalRightData[goalRightData.length - 1] || null;
-      const lastGoalLeftReading = goalLeftData[goalLeftData.length - 1] || null;
 
-      if (lastCenterReading && lastGoalRightReading && lastGoalLeftReading) {
-        setAverageHumidity(
-          (lastCenterReading.humidity_value +
-            lastGoalRightReading.humidity_value +
-            lastGoalLeftReading.humidity_value) / 3
-        );
+      if (lastCenterReading) {
+        setAverageHumidity(lastCenterReading.humidity_value);
       }
 
       // Actualizar la historia de la humedad
       const newHumidityHistory = [
         ...humidityHistory,
-        (lastCenterReading?.humidity_value + lastGoalRightReading?.humidity_value + lastGoalLeftReading?.humidity_value) / 3,
+        lastCenterReading ? lastCenterReading.humidity_value : 0,
       ];
 
       if (newHumidityHistory.length > 10) {
@@ -149,7 +135,6 @@ export default function HomePage() {
             </table>
           </div>
         </div>
-        {/* (Resto del código sigue igual) */}
       </div>
 
       {/* Promedio de Humedad y Recomendación de Guayos */}
