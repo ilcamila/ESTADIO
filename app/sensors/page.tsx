@@ -125,7 +125,7 @@ export default function GraphPage() {
       <div className="mt-12">
         <button
           className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-500"
-          onClick={() => router.push('/history')} // Redirige a la página de historial
+          onClick={() => router.push('app/sensors/history.tsx')} // Redirige a la página de historial
         >
           Ver Historial de Datos
         </button>
