@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { useRouter } from 'next/navigation'; // Usamos useRouter para la redirección
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -15,6 +16,7 @@ type HumidityData = {
 export default function GraphPage() {
   const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
+  const router = useRouter(); // Instanciamos el hook para redirigir
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -117,6 +119,16 @@ export default function GraphPage() {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Botón para redirigir al historial */}
+      <div className="mt-12">
+        <button
+          className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-500"
+          onClick={() => router.push('/history')} // Redirige a la página de historial
+        >
+          Ver Historial de Datos
+        </button>
       </div>
     </div>
   );
