@@ -15,12 +15,9 @@ type HumidityData = {
 export default function HomePage() {
   const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
   const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
-  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]);
-  const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
-  const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
-  const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
+  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]); // Elimina si no lo necesitas
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
-  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Store last 10 humidity readings
+  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -42,16 +39,11 @@ export default function HomePage() {
       setGoalRightHistory(prev => [...prev, ...goalRightData]);
       setGoalLeftHistory(prev => [...prev, ...goalLeftData]);
 
-      // Últimas lecturas
+      // Calcular promedio de humedad
       const lastCenterReading = centerData[centerData.length - 1] || null;
       const lastGoalRightReading = goalRightData[goalRightData.length - 1] || null;
       const lastGoalLeftReading = goalLeftData[goalLeftData.length - 1] || null;
 
-      setLatestCenterReading(lastCenterReading);
-      setLatestGoalRightReading(lastGoalRightReading);
-      setLatestGoalLeftReading(lastGoalLeftReading);
-
-      // Calcular promedio
       if (lastCenterReading && lastGoalRightReading && lastGoalLeftReading) {
         setAverageHumidity(
           (lastCenterReading.humidity_value +
@@ -157,29 +149,7 @@ export default function HomePage() {
             </table>
           </div>
         </div>
-
-        {/* Tabla de Humedad de la Portería Derecha */}
-        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
-          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Humedad - Portería Derecha</h2>
-          <div className="overflow-auto max-h-60">
-            <table className="min-w-full text-gray-800">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 font-medium text-left">Hora</th>
-                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {goalRightHistory.map((item, index) => (
-                  <tr key={index} className="even:bg-gray-100">
-                    <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                    <td className="px-4 py-2">{item.humidity_value}% HR</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        {/* (Resto del código sigue igual) */}
       </div>
 
       {/* Promedio de Humedad y Recomendación de Guayos */}
