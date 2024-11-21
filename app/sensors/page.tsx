@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Usamos useRouter para la redirección
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -14,14 +14,10 @@ type HumidityData = {
 };
 
 export default function GraphPage() {
-  const [humidityHistory, setHumidityHistory] = useState<number[]>([]);
+  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
-  const [humidityByLocation, setHumidityByLocation] = useState<{ [key: string]: number }>({
-    centro: 0,
-    porteriaderecha: 0,
-    porteriaizquierda: 0,
-  });
-  const router = useRouter();
+  const [humidityByLocation, setHumidityByLocation] = useState<{ [key: string]: number }>({}); // Guardar la humedad actual por ubicación
+  const router = useRouter(); // Instanciamos el hook para redirigir
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -47,20 +43,23 @@ export default function GraphPage() {
 
       setHumidityHistory(newHumidityHistory);
 
-      // Actualizar las lecturas actuales de humedad para cada ubicación
-      const humidityMap = {
+      // Inicializa el mapa de humedad
+      const humidityMap: { [key: string]: number } = {
         centro: 0,
         porteriaderecha: 0,
         porteriaizquierda: 0,
       };
 
+      // Recorre los datos y actualiza las lecturas de humedad
       data.forEach(item => {
-        if (humidityMap[item.location] !== undefined) {
-          humidityMap[item.location] = item.humidity_value;
+        const locationKey = item.location.toLowerCase(); // Convierte la clave a minúsculas
+        // Verifica que la clave existe en el mapa antes de actualizar
+        if (humidityMap.hasOwnProperty(locationKey)) {
+          humidityMap[locationKey] = item.humidity_value;
         }
       });
 
-      setHumidityByLocation(humidityMap);
+      setHumidityByLocation(humidityMap); // Actualiza el estado con los datos por ubicación
     }
 
     // Llamar a la función de obtención de datos por primera vez
@@ -73,6 +72,7 @@ export default function GraphPage() {
     return () => clearInterval(interval);
   }, [humidityHistory]);
 
+  // Función para determinar el tipo de guayo basado en la humedad promedio
   const getCleatsType = (humidity: number | null) => {
     if (humidity === null) return 'Cargando...';
 
@@ -91,14 +91,15 @@ export default function GraphPage() {
 
   const cleatsRecommendation = getCleatsType(averageHumidity);
 
+  // Datos para la gráfica
   const chartData = {
     labels: humidityHistory.map((_, index) => `Lectura ${index + 1}`),
     datasets: [
       {
         label: 'Humedad Promedio',
         data: humidityHistory,
-        borderColor: 'rgb(34, 211, 238)',
-        backgroundColor: 'rgba(34, 211, 238, 0.2)',
+        borderColor: 'rgb(34, 211, 238)', // Color de la línea
+        backgroundColor: 'rgba(34, 211, 238, 0.2)', // Color del fondo
         fill: true,
         tension: 0.1,
       },
@@ -109,20 +110,18 @@ export default function GraphPage() {
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
       <h1 className="text-6xl font-extrabold text-green-600 mb-6">Gráfica de Humedad Promedio</h1>
 
-      <div className="flex mb-6">
-        {/* Mostrar las lecturas actuales junto a la gráfica */}
-        <div className="w-full max-w-4xl bg-white bg-opacity-90 shadow-lg rounded-xl p-6 mb-12">
+      <div className="flex flex-col lg:flex-row items-center gap-6 w-full max-w-4xl bg-white bg-opacity-90 shadow-lg rounded-xl p-6 mb-12">
+        <div className="w-full">
           <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Humedad Promedio</h2>
           <Line data={chartData} />
         </div>
-        
-        {/* Panel de Humedad Actual por Ubicación */}
-        <div className="flex flex-col ml-12 text-center">
-          <h2 className="text-3xl font-semibold text-green-700 mb-6">Humedad Actual</h2>
+
+        <div className="w-full text-center">
+          <h2 className="text-2xl font-semibold text-green-700 mb-6">Lecturas Actuales de Humedad</h2>
           <div className="space-y-4">
-            <div className="text-xl font-bold text-green-600">Centro: {humidityByLocation.centro}% HR</div>
-            <div className="text-xl font-bold text-blue-600">Portería Derecha: {humidityByLocation.porteriaderecha}% HR</div>
-            <div className="text-xl font-bold text-red-600">Portería Izquierda: {humidityByLocation.porteriaizquierda}% HR</div>
+            <p><strong>Centro:</strong> {humidityByLocation.centro || 'Cargando...'}% HR</p>
+            <p><strong>Portería Derecha:</strong> {humidityByLocation.porteriaderecha || 'Cargando...'}% HR</p>
+            <p><strong>Portería Izquierda:</strong> {humidityByLocation.porteriaizquierda || 'Cargando...'}% HR</p>
           </div>
         </div>
       </div>
@@ -156,7 +155,7 @@ export default function GraphPage() {
       <div className="mt-12">
         <button
           className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-500"
-          onClick={() => router.push('/history')} // Redirige a la página de historial
+          onClick={() => router.push('/history')} // Ruta correcta para acceder al historial
         >
           Ver Historial de Datos
         </button>
