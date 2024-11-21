@@ -1,6 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 type HumidityData = {
   timestamp: string;
@@ -16,6 +20,7 @@ export default function HomePage() {
   const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
   const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
+  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Store last 10 humidity readings
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -54,6 +59,18 @@ export default function HomePage() {
             lastGoalLeftReading.humidity_value) / 3
         );
       }
+
+      // Actualizar la historia de la humedad
+      const newHumidityHistory = [
+        ...humidityHistory,
+        (lastCenterReading?.humidity_value + lastGoalRightReading?.humidity_value + lastGoalLeftReading?.humidity_value) / 3,
+      ];
+
+      if (newHumidityHistory.length > 10) {
+        newHumidityHistory.shift(); // Mantener solo los últimos 10 datos
+      }
+
+      setHumidityHistory(newHumidityHistory);
     }
 
     // Llamar a la función de obtención de datos por primera vez
@@ -64,7 +81,7 @@ export default function HomePage() {
 
     // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
-  }, []);
+  }, [humidityHistory]);
 
   // Función para determinar el tipo de guayo basado en la humedad promedio
   const getCleatsType = (humidity: number | null) => {
@@ -85,6 +102,21 @@ export default function HomePage() {
 
   const cleatsRecommendation = getCleatsType(averageHumidity);
 
+  // Datos para la gráfica
+  const chartData = {
+    labels: humidityHistory.map((_, index) => `Lectura ${index + 1}`),
+    datasets: [
+      {
+        label: 'Humedad Promedio',
+        data: humidityHistory,
+        borderColor: 'rgb(34, 211, 238)', // Color de la línea
+        backgroundColor: 'rgba(34, 211, 238, 0.2)', // Color del fondo
+        fill: true,
+        tension: 0.1,
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
       {/* Encabezado */}
@@ -93,6 +125,12 @@ export default function HomePage() {
         <p className="text-lg text-gray-800 leading-relaxed italic">
           &quot;Donde el fútbol cobra vida y los sueños se hacen realidad&quot;
         </p>
+      </div>
+
+      {/* Gráfica de la Humedad Promedio */}
+      <div className="w-full max-w-4xl bg-white bg-opacity-90 shadow-lg rounded-xl p-6 mb-12">
+        <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Gráfica de Humedad Promedio</h2>
+        <Line data={chartData} />
       </div>
 
       {/* Tablas de datos */}
@@ -142,37 +180,6 @@ export default function HomePage() {
             </table>
           </div>
         </div>
-
-        {/* Tabla de Humedad de la Portería Izquierda */}
-        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
-          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Humedad - Portería Izquierda</h2>
-          <div className="overflow-auto max-h-60">
-            <table className="min-w-full text-gray-800">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 font-medium text-left">Hora</th>
-                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {goalLeftHistory.map((item, index) => (
-                  <tr key={index} className="even:bg-gray-100">
-                    <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                    <td className="px-4 py-2">{item.humidity_value}% HR</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Últimas lecturas */}
-      <div className="w-full max-w-lg bg-white shadow-lg rounded-xl p-6 mt-12 text-center">
-        <h2 className="text-3xl font-semibold text-gray-700 mb-4">Últimas Lecturas</h2>
-        <p>Centro: {latestCenterReading ? `${latestCenterReading.humidity_value}% HR` : 'Sin datos'}</p>
-        <p>Portería Derecha: {latestGoalRightReading ? `${latestGoalRightReading.humidity_value}% HR` : 'Sin datos'}</p>
-        <p>Portería Izquierda: {latestGoalLeftReading ? `${latestGoalLeftReading.humidity_value}% HR` : 'Sin datos'}</p>
       </div>
 
       {/* Promedio de Humedad y Recomendación de Guayos */}
