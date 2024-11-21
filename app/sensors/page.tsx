@@ -17,6 +17,7 @@ export default function GraphPage() {
   const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
   const [humidityByLocation, setHumidityByLocation] = useState<{ [key: string]: number }>({}); // Guardar la humedad actual por ubicación
+  const [currentTemperature, setCurrentTemperature] = useState<number | null>(null); // Temperatura actual
   const router = useRouter(); // Instanciamos el hook para redirigir
 
   useEffect(() => {
@@ -71,6 +72,26 @@ export default function GraphPage() {
     // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
   }, [humidityHistory]);
+
+  // Obtener la temperatura actual desde OpenWeatherMap (requiere clave de API)
+  useEffect(() => {
+    async function fetchTemperature() {
+      const apiKey = 'db13ad9597a138dfa4da26c00c31b22b'; // Coloca tu clave de API de OpenWeatherMap
+      const city = 'Bogotá'; // Cambia por la ciudad que desees
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Bogotá&appid=db13ad9597a138dfada26c00c31b22b&units=metric
+`);
+      const data = await response.json();
+      if (data.main) {
+        setCurrentTemperature(data.main.temp); // Asignamos la temperatura
+      }
+    }
+
+    fetchTemperature(); // Llamar a la función para obtener la temperatura
+
+    const interval = setInterval(fetchTemperature, 30000); // Actualizar cada 30 segundos
+
+    return () => clearInterval(interval); // Limpiar el intervalo cuando el componente se desmonta
+  }, []);
 
   // Función para determinar el tipo de guayo basado en la humedad promedio
   const getCleatsType = (humidity: number | null) => {
@@ -137,6 +158,13 @@ export default function GraphPage() {
                 {humidityByLocation.porteriaizquierda !== undefined ? `${humidityByLocation.porteriaizquierda}% HR` : 'Cargando...'}
               </p>
             </div>
+          </div>
+          {/* Mostrar la temperatura actual */}
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold text-green-700">Temperatura Actual</h3>
+            <p className="text-3xl font-bold text-blue-500">
+              {currentTemperature !== null ? `${currentTemperature.toFixed(1)}°C` : 'Cargando...'}
+            </p>
           </div>
         </div>
       </div>
