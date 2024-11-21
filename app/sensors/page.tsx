@@ -76,8 +76,6 @@ export default function GraphPage() {
   // Obtener la temperatura actual desde OpenWeatherMap (requiere clave de API)
   useEffect(() => {
     async function fetchTemperature() {
-      const apiKey = 'db13ad9597a138dfa4da26c00c31b22b'; // Coloca tu clave de API de OpenWeatherMap
-      const city = 'Fusagasugá'; // Cambia por la ciudad que desees
       const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Fusagasugá&appid=db13ad9597a138dfa4da26c00c31b22b&units=metric`);
       const data = await response.json();
       if (data.main) {
