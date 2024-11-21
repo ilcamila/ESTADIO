@@ -12,4 +12,6 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = {
+  pageExtensions: ['tsx', 'ts'], // Asegúrate de que tus páginas estén bien configuradas
+}
