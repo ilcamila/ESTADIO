@@ -116,12 +116,27 @@ export default function GraphPage() {
           <Line data={chartData} />
         </div>
 
-        <div className="w-full text-center">
+        <div className="w-full text-center space-y-4">
           <h2 className="text-2xl font-semibold text-green-700 mb-6">Lecturas Actuales de Humedad</h2>
-          <div className="space-y-4">
-            <p><strong>Centro:</strong> {humidityByLocation.centro || 'Cargando...'}% HR</p>
-            <p><strong>Portería Derecha:</strong> {humidityByLocation.porteriaderecha || 'Cargando...'}% HR</p>
-            <p><strong>Portería Izquierda:</strong> {humidityByLocation.porteriaizquierda || 'Cargando...'}% HR</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4">
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold text-green-700">Centro</h3>
+              <p className="text-3xl font-bold text-blue-500">
+                {humidityByLocation.centro !== undefined ? `${humidityByLocation.centro}% HR` : 'Cargando...'}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold text-green-700">Portería Derecha</h3>
+              <p className="text-3xl font-bold text-blue-500">
+                {humidityByLocation.porteriaderecha !== undefined ? `${humidityByLocation.porteriaderecha}% HR` : 'Cargando...'}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold text-green-700">Portería Izquierda</h3>
+              <p className="text-3xl font-bold text-blue-500">
+                {humidityByLocation.porteriaizquierda !== undefined ? `${humidityByLocation.porteriaizquierda}% HR` : 'Cargando...'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
