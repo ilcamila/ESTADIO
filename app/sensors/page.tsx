@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image'; // Importar el componente Image de next/image
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -14,11 +13,13 @@ type HumidityData = {
 };
 
 export default function HomePage() {
+  const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
+  const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
+  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]);
   const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
   const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
   const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
-  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -44,7 +45,7 @@ export default function HomePage() {
       setLatestGoalRightReading(lastGoalRightReading);
       setLatestGoalLeftReading(lastGoalLeftReading);
 
-      // Calcular promedio
+      // Calcular promedio de humedad
       if (lastCenterReading && lastGoalRightReading && lastGoalLeftReading) {
         setAverageHumidity(
           (lastCenterReading.humidity_value +
@@ -52,32 +53,33 @@ export default function HomePage() {
             lastGoalLeftReading.humidity_value) / 3
         );
       }
-
-      // Actualizar la historia de la humedad
-      const newHumidityHistory = [
-        ...humidityHistory,
-        (lastCenterReading?.humidity_value + lastGoalRightReading?.humidity_value + lastGoalLeftReading?.humidity_value) / 3,
-      ];
-
-      if (newHumidityHistory.length > 10) {
-        newHumidityHistory.shift(); // Mantener solo los últimos 10 datos
-      }
-
-      setHumidityHistory(newHumidityHistory);
     }
 
+    // Llamar a la función de obtención de datos por primera vez
     fetchHumidityData();
+
+    // Establecer un intervalo para actualizar automáticamente cada 30 segundos
     const interval = setInterval(fetchHumidityData, 30000);
 
+    // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
-  }, [humidityHistory]);
+  }, []);
 
+  // Función para determinar el tipo de guayo basado en la humedad promedio
   const getCleatsType = (humidity: number | null) => {
     if (humidity === null) return 'Cargando...';
-    if (humidity < 10) return 'Firm Ground (FG): Taches cortos';
-    if (humidity >= 10 && humidity <= 30) return 'Firm Ground (FG) o Hybrid Ground';
-    if (humidity > 30 && humidity <= 60) return 'Soft Ground (SG): Taches largos';
-    return 'Soft Ground (SG): Taches largos';
+
+    if (humidity < 10) {
+      return 'Firm Ground (FG): Taches cortos';
+    } else if (humidity >= 10 && humidity <= 30) {
+      return 'Firm Ground (FG) o Hybrid Ground';
+    } else if (humidity > 30 && humidity <= 60) {
+      return 'Soft Ground (SG): Taches largos';
+    } else if (humidity > 60) {
+      return 'Soft Ground (SG): Taches largos';
+    } else {
+      return 'Césped sintético: Artificial Ground (AG) con taches cortos';
+    }
   };
 
   const cleatsRecommendation = getCleatsType(averageHumidity);
@@ -92,26 +94,27 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Imagen de la cancha */}
+      {/* Imagen del campo de fútbol */}
       <div className="relative w-full max-w-6xl mb-12">
-        <Image
-          src="/image.jpg" // Ruta de la imagen de la cancha
+        <img
+          src="https://media.istockphoto.com/id/1142584719/es/vector/campo-de-f%C3%BAtbol-de-textura-realista-de-un-c%C3%A9sped-verde-antecedentes-de-f%C3%BAtbol.jpg?s=612x612&w=0&k=20&c=bb3rIa7NMNIzlaNt7z2X320gFbPDF8uZwcLc2R1DVFo="
           alt="Cancha de fútbol"
-          width={1000}
-          height={500}
           className="w-full h-auto rounded-xl shadow-lg"
         />
-        
-        {/* Lecturas de humedad encima de la imagen */}
+
+        {/* Lecturas de humedad encima de la imagen, en las respectivas zonas */}
         <div className="absolute inset-0 flex justify-between p-6">
-          <div className="text-white font-semibold text-xl">
+          <div className="absolute top-10 left-1/4 text-white font-semibold text-xl">
             <p>Centro: {latestCenterReading ? `${latestCenterReading.humidity_value}% HR` : 'Sin datos'}</p>
+            <p>{latestCenterReading ? new Date(latestCenterReading.timestamp).toLocaleTimeString() : ''}</p>
           </div>
-          <div className="text-white font-semibold text-xl">
+          <div className="absolute top-10 right-1/4 text-white font-semibold text-xl">
             <p>Portería Derecha: {latestGoalRightReading ? `${latestGoalRightReading.humidity_value}% HR` : 'Sin datos'}</p>
+            <p>{latestGoalRightReading ? new Date(latestGoalRightReading.timestamp).toLocaleTimeString() : ''}</p>
           </div>
-          <div className="text-white font-semibold text-xl">
+          <div className="absolute bottom-10 left-1/4 text-white font-semibold text-xl">
             <p>Portería Izquierda: {latestGoalLeftReading ? `${latestGoalLeftReading.humidity_value}% HR` : 'Sin datos'}</p>
+            <p>{latestGoalLeftReading ? new Date(latestGoalLeftReading.timestamp).toLocaleTimeString() : ''}</p>
           </div>
         </div>
       </div>
