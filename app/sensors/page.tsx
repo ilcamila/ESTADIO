@@ -78,8 +78,7 @@ export default function GraphPage() {
     async function fetchTemperature() {
       const apiKey = 'db13ad9597a138dfa4da26c00c31b22b'; // Coloca tu clave de API de OpenWeatherMap
       const city = 'Bogotá'; // Cambia por la ciudad que desees
-      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Bogotá&appid=db13ad9597a138dfada26c00c31b22b&units=metric
-`);
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Bogotá&appid=db13ad9597a138dfada26c00c31b22b&units=metric`);
       const data = await response.json();
       if (data.main) {
         setCurrentTemperature(data.main.temp); // Asignamos la temperatura
