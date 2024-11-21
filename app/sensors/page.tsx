@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';  // Importa el componente Image
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -13,9 +14,6 @@ type HumidityData = {
 };
 
 export default function HomePage() {
-  const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
-  const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
-  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]);
   const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
   const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
   const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
@@ -55,13 +53,9 @@ export default function HomePage() {
       }
     }
 
-    // Llamar a la función de obtención de datos por primera vez
     fetchHumidityData();
-
-    // Establecer un intervalo para actualizar automáticamente cada 30 segundos
     const interval = setInterval(fetchHumidityData, 30000);
 
-    // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
   }, []);
 
@@ -96,9 +90,11 @@ export default function HomePage() {
 
       {/* Imagen del campo de fútbol */}
       <div className="relative w-full max-w-6xl mb-12">
-        <img
+        <Image
           src="https://media.istockphoto.com/id/1142584719/es/vector/campo-de-f%C3%BAtbol-de-textura-realista-de-un-c%C3%A9sped-verde-antecedentes-de-f%C3%BAtbol.jpg?s=612x612&w=0&k=20&c=bb3rIa7NMNIzlaNt7z2X320gFbPDF8uZwcLc2R1DVFo="
           alt="Cancha de fútbol"
+          width={1000}
+          height={500}
           className="w-full h-auto rounded-xl shadow-lg"
         />
 
