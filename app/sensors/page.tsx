@@ -102,7 +102,7 @@ export default function HomePage() {
       {/* Imagen de la cancha */}
       <div className="relative w-full max-w-6xl mb-12">
         <img
-          src="public\image.jpg" // Ruta de la imagen de la cancha cargada
+          src="/image.jpg" // Ruta de la imagen de la cancha cargada
           alt="Cancha de fútbol"
           className="w-full h-auto rounded-xl shadow-lg"
         />
