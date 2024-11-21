@@ -82,9 +82,45 @@ export default function GraphPage() {
       if (data.main) {
         setCurrentTemperature(data.main.temp); // Asignamos la temperatura
       }
-      
+
       if (data.weather && data.weather.length > 0) {
-        setWeatherCondition(data.weather[0].description); // Asignamos la descripción del clima
+        // Traducir la condición del clima
+        const condition = data.weather[0].description.toLowerCase();
+        let translatedCondition = '';
+
+        switch (condition) {
+          case 'clear sky':
+            translatedCondition = 'Cielo despejado';
+            break;
+          case 'few clouds':
+            translatedCondition = 'Pocas nubes';
+            break;
+          case 'scattered clouds':
+            translatedCondition = 'Nubes dispersas';
+            break;
+          case 'broken clouds':
+            translatedCondition = 'Nubes rotas';
+            break;
+          case 'shower rain':
+            translatedCondition = 'Chubascos de lluvia';
+            break;
+          case 'rain':
+            translatedCondition = 'Lluvia';
+            break;
+          case 'thunderstorm':
+            translatedCondition = 'Tormenta eléctrica';
+            break;
+          case 'snow':
+            translatedCondition = 'Nieve';
+            break;
+          case 'mist':
+            translatedCondition = 'Niebla';
+            break;
+          default:
+            translatedCondition = condition; // Si no está en el listado, dejamos el original
+        }
+
+        setWeatherCondition(translatedCondition); // Asignamos la condición traducida
       }
     }
 
@@ -168,8 +204,11 @@ export default function GraphPage() {
             <p className="text-3xl font-bold text-blue-500">
               {currentTemperature !== null ? `${currentTemperature.toFixed(1)}°C` : 'Cargando...'}
             </p>
-            {/* Mostrar la condición del clima */}
-            <h3 className="text-xl font-semibold text-green-700">Condición del Clima</h3>
+          </div>
+
+          {/* Mostrar la condición del clima */}
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold text-green-700">Condición Climática</h3>
             <p className="text-3xl font-bold text-blue-500">
               {weatherCondition !== '' ? weatherCondition : 'Cargando...'}
             </p>
