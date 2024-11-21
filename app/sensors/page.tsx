@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image'; // Importar el componente Image de next/image
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -13,13 +14,11 @@ type HumidityData = {
 };
 
 export default function HomePage() {
-  const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
-  const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
-  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]);
   const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
   const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
   const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
+  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -35,11 +34,6 @@ export default function HomePage() {
       centerData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       goalRightData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       goalLeftData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-      // Actualizar el historial añadiendo datos nuevos
-      setCenterHistory(prev => [...prev, ...centerData]);
-      setGoalRightHistory(prev => [...prev, ...goalRightData]);
-      setGoalLeftHistory(prev => [...prev, ...goalLeftData]);
 
       // Últimas lecturas
       const lastCenterReading = centerData[centerData.length - 1] || null;
@@ -58,33 +52,32 @@ export default function HomePage() {
             lastGoalLeftReading.humidity_value) / 3
         );
       }
+
+      // Actualizar la historia de la humedad
+      const newHumidityHistory = [
+        ...humidityHistory,
+        (lastCenterReading?.humidity_value + lastGoalRightReading?.humidity_value + lastGoalLeftReading?.humidity_value) / 3,
+      ];
+
+      if (newHumidityHistory.length > 10) {
+        newHumidityHistory.shift(); // Mantener solo los últimos 10 datos
+      }
+
+      setHumidityHistory(newHumidityHistory);
     }
 
-    // Llamar a la función de obtención de datos por primera vez
     fetchHumidityData();
-
-    // Establecer un intervalo para actualizar automáticamente cada 30 segundos
     const interval = setInterval(fetchHumidityData, 30000);
 
-    // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
-  }, []);
+  }, [humidityHistory]);
 
-  // Función para determinar el tipo de guayo basado en la humedad promedio
   const getCleatsType = (humidity: number | null) => {
     if (humidity === null) return 'Cargando...';
-
-    if (humidity < 10) {
-      return 'Firm Ground (FG): Taches cortos';
-    } else if (humidity >= 10 && humidity <= 30) {
-      return 'Firm Ground (FG) o Hybrid Ground';
-    } else if (humidity > 30 && humidity <= 60) {
-      return 'Soft Ground (SG): Taches largos';
-    } else if (humidity > 60) {
-      return 'Soft Ground (SG): Taches largos';
-    } else {
-      return 'Césped sintético: Artificial Ground (AG) con taches cortos';
-    }
+    if (humidity < 10) return 'Firm Ground (FG): Taches cortos';
+    if (humidity >= 10 && humidity <= 30) return 'Firm Ground (FG) o Hybrid Ground';
+    if (humidity > 30 && humidity <= 60) return 'Soft Ground (SG): Taches largos';
+    return 'Soft Ground (SG): Taches largos';
   };
 
   const cleatsRecommendation = getCleatsType(averageHumidity);
@@ -101,9 +94,11 @@ export default function HomePage() {
 
       {/* Imagen de la cancha */}
       <div className="relative w-full max-w-6xl mb-12">
-        <img
-          src="/image.jpg" // Ruta de la imagen de la cancha cargada
+        <Image
+          src="/image.jpg" // Ruta de la imagen de la cancha
           alt="Cancha de fútbol"
+          width={1000}
+          height={500}
           className="w-full h-auto rounded-xl shadow-lg"
         />
         
