@@ -18,6 +18,7 @@ export default function GraphPage() {
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
   const [humidityByLocation, setHumidityByLocation] = useState<{ [key: string]: number }>({}); // Guardar la humedad actual por ubicación
   const [currentTemperature, setCurrentTemperature] = useState<number | null>(null); // Temperatura actual
+  const [weatherCondition, setWeatherCondition] = useState<string>(''); // Condición del clima (lluvia, nublado, etc.)
   const router = useRouter(); // Instanciamos el hook para redirigir
 
   useEffect(() => {
@@ -80,6 +81,10 @@ export default function GraphPage() {
       const data = await response.json();
       if (data.main) {
         setCurrentTemperature(data.main.temp); // Asignamos la temperatura
+      }
+      
+      if (data.weather && data.weather.length > 0) {
+        setWeatherCondition(data.weather[0].description); // Asignamos la descripción del clima
       }
     }
 
@@ -156,11 +161,17 @@ export default function GraphPage() {
               </p>
             </div>
           </div>
+
           {/* Mostrar la temperatura actual */}
           <div className="mt-4">
             <h3 className="text-xl font-semibold text-green-700">Temperatura Actual</h3>
             <p className="text-3xl font-bold text-blue-500">
               {currentTemperature !== null ? `${currentTemperature.toFixed(1)}°C` : 'Cargando...'}
+            </p>
+            {/* Mostrar la condición del clima */}
+            <h3 className="text-xl font-semibold text-green-700">Condición del Clima</h3>
+            <p className="text-3xl font-bold text-blue-500">
+              {weatherCondition !== '' ? weatherCondition : 'Cargando...'}
             </p>
           </div>
         </div>
