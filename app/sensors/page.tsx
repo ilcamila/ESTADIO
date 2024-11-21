@@ -14,8 +14,12 @@ type HumidityData = {
 
 export default function HomePage() {
   const [centerHistory, setCenterHistory] = useState<HumidityData[]>([]);
+  const [goalRightHistory, setGoalRightHistory] = useState<HumidityData[]>([]);
+  const [goalLeftHistory, setGoalLeftHistory] = useState<HumidityData[]>([]);
+  const [latestCenterReading, setLatestCenterReading] = useState<HumidityData | null>(null);
+  const [latestGoalRightReading, setLatestGoalRightReading] = useState<HumidityData | null>(null);
+  const [latestGoalLeftReading, setLatestGoalLeftReading] = useState<HumidityData | null>(null);
   const [averageHumidity, setAverageHumidity] = useState<number | null>(null);
-  const [humidityHistory, setHumidityHistory] = useState<number[]>([]); // Guardar los últimos 10 datos de humedad
 
   useEffect(() => {
     async function fetchHumidityData() {
@@ -24,31 +28,36 @@ export default function HomePage() {
 
       // Filtrar datos por ubicación
       const centerData = data.filter(item => item.location === 'centro');
+      const goalRightData = data.filter(item => item.location === 'porteriaderecha');
+      const goalLeftData = data.filter(item => item.location === 'porteriaizquierda');
 
       // Ordenar datos por timestamp
       centerData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      goalRightData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      goalLeftData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
       // Actualizar el historial añadiendo datos nuevos
       setCenterHistory(prev => [...prev, ...centerData]);
+      setGoalRightHistory(prev => [...prev, ...goalRightData]);
+      setGoalLeftHistory(prev => [...prev, ...goalLeftData]);
 
-      // Calcular promedio de humedad
+      // Últimas lecturas
       const lastCenterReading = centerData[centerData.length - 1] || null;
+      const lastGoalRightReading = goalRightData[goalRightData.length - 1] || null;
+      const lastGoalLeftReading = goalLeftData[goalLeftData.length - 1] || null;
 
-      if (lastCenterReading) {
-        setAverageHumidity(lastCenterReading.humidity_value);
+      setLatestCenterReading(lastCenterReading);
+      setLatestGoalRightReading(lastGoalRightReading);
+      setLatestGoalLeftReading(lastGoalLeftReading);
+
+      // Calcular promedio
+      if (lastCenterReading && lastGoalRightReading && lastGoalLeftReading) {
+        setAverageHumidity(
+          (lastCenterReading.humidity_value +
+            lastGoalRightReading.humidity_value +
+            lastGoalLeftReading.humidity_value) / 3
+        );
       }
-
-      // Actualizar la historia de la humedad
-      const newHumidityHistory = [
-        ...humidityHistory,
-        lastCenterReading ? lastCenterReading.humidity_value : 0,
-      ];
-
-      if (newHumidityHistory.length > 10) {
-        newHumidityHistory.shift(); // Mantener solo los últimos 10 datos
-      }
-
-      setHumidityHistory(newHumidityHistory);
     }
 
     // Llamar a la función de obtención de datos por primera vez
@@ -59,7 +68,7 @@ export default function HomePage() {
 
     // Limpiar el intervalo cuando el componente se desmonta
     return () => clearInterval(interval);
-  }, [humidityHistory]);
+  }, []);
 
   // Función para determinar el tipo de guayo basado en la humedad promedio
   const getCleatsType = (humidity: number | null) => {
@@ -80,21 +89,6 @@ export default function HomePage() {
 
   const cleatsRecommendation = getCleatsType(averageHumidity);
 
-  // Datos para la gráfica
-  const chartData = {
-    labels: humidityHistory.map((_, index) => `Lectura ${index + 1}`),
-    datasets: [
-      {
-        label: 'Humedad Promedio',
-        data: humidityHistory,
-        borderColor: 'rgb(34, 211, 238)', // Color de la línea
-        backgroundColor: 'rgba(34, 211, 238, 0.2)', // Color del fondo
-        fill: true,
-        tension: 0.1,
-      },
-    ],
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-white to-green-900 flex flex-col items-center justify-center p-6">
       {/* Encabezado */}
@@ -105,34 +99,24 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Gráfica de la Humedad Promedio */}
-      <div className="w-full max-w-4xl bg-white bg-opacity-90 shadow-lg rounded-xl p-6 mb-12">
-        <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Gráfica de Humedad Promedio</h2>
-        <Line data={chartData} />
-      </div>
-
-      {/* Tablas de datos */}
-      <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl">
-        {/* Tabla de Humedad del Centro */}
-        <div className="flex-1 bg-white bg-opacity-90 shadow-lg rounded-xl p-6">
-          <h2 className="text-3xl font-semibold text-green-700 text-center mb-6">Humedad - Centro</h2>
-          <div className="overflow-auto max-h-60">
-            <table className="min-w-full text-gray-800">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 font-medium text-left">Hora</th>
-                  <th className="px-4 py-2 font-medium text-left">Humedad (% HR)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {centerHistory.map((item, index) => (
-                  <tr key={index} className="even:bg-gray-100">
-                    <td className="px-4 py-2">{new Date(item.timestamp).toLocaleTimeString()}</td>
-                    <td className="px-4 py-2">{item.humidity_value}% HR</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Imagen de la cancha */}
+      <div className="relative w-full max-w-6xl mb-12">
+        <img
+          src="public\image.jpg" // Ruta de la imagen de la cancha cargada
+          alt="Cancha de fútbol"
+          className="w-full h-auto rounded-xl shadow-lg"
+        />
+        
+        {/* Lecturas de humedad encima de la imagen */}
+        <div className="absolute inset-0 flex justify-between p-6">
+          <div className="text-white font-semibold text-xl">
+            <p>Centro: {latestCenterReading ? `${latestCenterReading.humidity_value}% HR` : 'Sin datos'}</p>
+          </div>
+          <div className="text-white font-semibold text-xl">
+            <p>Portería Derecha: {latestGoalRightReading ? `${latestGoalRightReading.humidity_value}% HR` : 'Sin datos'}</p>
+          </div>
+          <div className="text-white font-semibold text-xl">
+            <p>Portería Izquierda: {latestGoalLeftReading ? `${latestGoalLeftReading.humidity_value}% HR` : 'Sin datos'}</p>
           </div>
         </div>
       </div>
